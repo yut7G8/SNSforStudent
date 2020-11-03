@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'jumbotron.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="{%url 'app:select'%}">学生向けSNS</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{%url 'app:login'%}">ログイン<span class="sr-only">(current)</span></a>
+          </li>
+        </ul>
+      </div>
+
+</nav>
+  
+  <main role="main">
+  
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">Hello!!</h1>
+        <p>学生向けのSNSのサインアップページです！当てはまるものからアカウントを作成してください！</p>
+        <p><a class="btn btn-secondary" href="{%url 'app:login'%}" role="button">すでにアカウントをお持ちの方はこちら &raquo;</a></p>
+      </div>
+    </div>
+  
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+            <h2>学生ユーザー</h2>
+            <p>学生のユーザー用のアカウントを作成します</p>
+          <p><a class="btn btn-primary" href="{% url 'app:student_create' %}" role="button">Make Account &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>サークル</h2>
+            <p>サークル用のアカウントを作成します</p>
+          <p><a class="btn btn-primary" href="{%url 'app:user_create'%}" role="button">Make Account &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>企業</h2>
+            <p>企業用のアカウントを作成します</p>
+          <p><a class="btn btn-primary" href="{%url 'app:company_create'%}" role="button">Make Account &raquo;</a></p>
+        </div>
+      </div>
+  
+      <hr>
+  
+    </div> <!-- /container -->
+  
+  </main>
+
+  <!--いらないかも
+  <div>
+    <p><a class="btn btn-primary" href="{%url 'app:signup'%}" role="button">Make Account &raquo;</a></p>
+  </div> -->
+  
+  <footer class="container">
+    <p>&copy; Company 2017-2020</p>
+  </footer>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script>window.jQuery || document.write('<script src="/docs/4.5/assets/js/vendor/jquery.slim.min.js"><\/script>')</script><script src="/docs/4.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
+{% endblock content %}
