@@ -13,7 +13,7 @@
           <div class="col-sm-8 col-md-7 py-4">
             <h4 class="text-white">Menu</h4>
             <ul class="list-unstyled">
-                <li><a href="{%url 'app:student_home'%}" class="text-white">top</a></li>              
+                <li><a href="{%url 'app:student_home'%}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
                 <li><a href="{%url 'app:view_societies'%}" class="text-white">サークル一覧</a></li>
@@ -47,42 +47,51 @@
 {% endblock header %}
 
 {% block content %}
+<table class="table">
+    <tbody>
+        <tr>
+            <th>ユーザー名</th>
+            <td>{{ student.email }}</td>
+        </tr>
+        <tr>
+            <th>姓</th>
+            <td>{{ student.first_name }}</td>
+        </tr>
+        <tr>
+            <th>名</th>
+            <td>{{ student.last_name }}</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<h3 style="text-align:center">フォローしてるサークル</h3>
 <main role="main">
-<div class="album py-5 bg-light">
-  <div class="container">
-    <!-- 検索結果の数 -->
-    {% if query %}
-    <p class="text-center font-weight-bold h4">検索結果は、{{object_list.count}}件</p>
-    {% endif%}
-    <!-- 検索結果の数 -->
-
-    {% for item in object_list %}
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-          <!--<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Student</text></svg>-->
-          <br>
-          <p><img src="{{item.images.url}}" height="225" style="display: block; margin: auto;"></p>
-          <div class="card-body">
-            <!--<p class="card-text">This page is for students.</p>-->
-            <p><a href="{%url 'app:detail' item.pk %}">{{item.title}}</a></p>
-            <p>投稿者：{{item.author}}</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <!--<button type="button" href="{%url 'app:good' item.pk %}" class="btn btn-sm btn-outline-secondary" aria-pressed="true">good:{{item.good}}</button>-->
-                <a href="{%url 'app:good' item.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">good：{{item.good}}</a>
-                <button type="button" href="#" class="btn btn-sm btn-outline-secondary">Edit</butto>
-              </div>
-              <small class="text-muted">9 mins</small>
+    <div class="album py-5 bg-light">
+        <div class="container">
+        {% for society in following %} 
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <br>
+                    <div class="card-body">
+                        <!--<p class="card-text">This page is for students.</p>-->
+                        <!--<p>サークル：{{society.society_name}}</p>-->
+                        <p><a href="{%url 'app:detail_society' society.pk %}">{{society.society_name}}</a></p>
+                        <p>{{society.school_name}}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div class="btn-group">
+                            <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
+                          </div>
+                          <small class="text-muted">9 mins</small>
+                        </div>
+                      </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+        {% endfor %}
+    
+        </div>
     </div>
-    {% endfor %}
-
-  </div>
-</div>
 </main>
-{% endblock content %}
+{% endblock %}
 </html>

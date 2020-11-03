@@ -6,6 +6,9 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from .models import User, Student, Company, BoardModel
 
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+
 from django.forms import ModelForm
 
 #User = get_user_model()
