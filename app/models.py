@@ -5,6 +5,8 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+from django.urls import reverse
+
 #create_userとcreate_superuserメソッドを定義しているUserManagerというクラスも修正する必要がある
 #create_user:ユーザーの新規作成時に呼び出されるメソッド
 #create_superuser:管理者用のユーザーを作成するときに使われるメソッド
@@ -48,6 +50,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     society_name = models.CharField(_('society name'), max_length=150, blank=True)
+    about_me = models.TextField(blank=True)
+
+    followers_number = models.IntegerField(_('followers_number'),null=True,blank=True,default=0)
+    following_number = models.IntegerField(_('following_number'),null=True,blank=True,default=0)
 
 
     is_student = models.BooleanField(default=False)
@@ -81,20 +87,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
-
-    # ここいらない
-    '''
-    def get_full_name(self):
-        """Return the first_name plus the last_name, with a space in
-        between."""
-        full_name = '%s %s' % (self.society_name)
-        return full_name.strip()
-
-    
-    def get_short_name(self):
-        """Return the short name for the user."""
-        return self.first_name
-    '''
     
 
     def email_user(self, subject, message, from_email=None, **kwargs):
@@ -109,6 +101,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         メールアドレスを返す
         """
         return self.email
+
+
+    def get_absolute_url(self):
+        print("model")
+        return reverse('profile', kwargs={'username': self.username})
 
 
 # StudentUser
@@ -117,30 +114,6 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username
-    
-
-    #念のため残してるけどStudentUserのこの部分は恐らくいらない。
-    '''
-    first_name = models.CharField(_('first name'), max_length=30, blank=True)
-    last_name = models.CharField(_('last name'), max_length=150, blank=True)
-    
-    grade = models.IntegerField(_('grade'),null=True,blank=True,default=0)
-    school_name = models.CharField(_('school name'),max_length=100,null=True)
-    email = models.EmailField(_('email address'), unique=True, default=None)
-
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
-
-    @property
-    def username(self):
-        """username属性のゲッター
-
-        他アプリケーションが、username属性にアクセスした場合に備えて定義
-        メールアドレスを返す
-        """
-        return self.email
-    '''
     
 
 
@@ -154,6 +127,9 @@ class Company(models.Model):
 
 # 投稿用モデル
 class BoardModel(models.Model):
+
+    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    
     title = models.CharField(max_length=100)
     content = models.TextField()
     author = models.CharField(max_length=100)
@@ -161,4 +137,13 @@ class BoardModel(models.Model):
     good = models.IntegerField()
     read = models.IntegerField()
     readtext = models.CharField(max_length=200)
-    #author2 = models.ForeignKey(User,varbose_name = '作者',on_delete=models.PROTECT)
+
+
+# フォロー
+class Connection(models.Model):
+    follower = models.ForeignKey(User, related_name='follower', on_delete=models.CASCADE)
+    following = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "{} : {}".format(self.follower.username, self.following.username)
