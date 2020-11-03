@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import (
     LoginView, LogoutView
 )
-from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth import authenticate, login,logout, update_session_auth_hash
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import redirect,render
 from django.template.loader import render_to_string
 from django.views import generic
@@ -15,14 +15,20 @@ from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm
 )
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView, UpdateView
 
-from .models import User, Student, Company, BoardModel
+from .models import User, Student, Company, BoardModel, Connection
 from .decorators import student_required, society_required, company_required
 
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
 from itertools import chain
+
+from django.urls import reverse_lazy
+from .helpers import get_current_user
+from django.contrib import messages
+
+from django.utils.decorators import method_decorator
 
 # ログイン前のページ表示
 def selectfunc(request):
@@ -37,8 +43,6 @@ class SignUpView(TemplateView):
 # login
 def loginfunc(request):
     if request.method == 'POST':
-        unko = User.objects.get(email=request.POST.get('username'))
-        print(unko.is_society)
         username = request.POST.get('username')
         password = request.POST.get('password')
         user_login = User.objects.get(email=username)
@@ -46,14 +50,10 @@ def loginfunc(request):
         if user is not None:
             login(request, user_login)
             if user_login.is_student:
-                #return render(request, 'list.html')
-                #return redirect('app:list')
                 return redirect('app:student_home')
             if user_login.is_society:
-                #return render(request, 'society_home.html')
                 return redirect('app:society_home')
             if user_login.is_company:
-                #return render(request, 'company_home.html')
                 return redirect('app:company_home')
         else:
             return render(request, 'login.html', {'error':'メールアドレスかパスワードが間違っています'})
@@ -68,53 +68,15 @@ def student_home(request):
     query = request.GET.get('q')
     if query:
         object_list = BoardModel.objects.all()
-        #object_list = User.objects.all()
 
         object_list = object_list.filter(
             Q(title__icontains=query) |
             Q(author__icontains=query)
         ).distinct()
-        #b_count = b_object_list.count()
-
-        # u_object_list = u_object_list.filter(
-        #     Q(society_name__icontains=query)
-        # ).distinct()
-        # u_count = u_object_list.count()
-
-        #object_list = list(chain(b_object_list,u_object_list))
-        # print(b_count)
-        # print(u_count)
-        # count_sum = b_count + u_count
-
-
-        if object_list:
-        
-            print('入ってますよ')
-
-        else:
-            print('ふざけんなこのやろうしね')
-        
-        #return render(request,'student_home.html',{'b_object_list':b_object_list,'u_object_list':u_object_list,'query':query,'count':count_sum})
 
     else:
-        #print(BoardModel.objects.all().get(author='soccer'))
-        #count_sum = 0
         object_list = BoardModel.objects.all()
     return render(request, 'student_home.html', {'object_list':object_list,'query': query})
-    #return render(request,'student_home.html')
-
-
-# def index(request):
-#    query = request.GET.get('q')
-#    if query:
-#        posts = Post.objects.all().order_by('-created_at')
-#        posts = posts.filter(
-#        Q(title__icontains=query)|
-#        Q(user__username__icontains=query)
-#        ).distinct()
-#    else:
-#        posts = Post.objects.all().order_by('-created_at')  
-#    return render(request, 'blog_app/index.html', {'posts': posts, 'query': query,}) #省略
 
 
 # SocietyUserのhome画面
@@ -180,10 +142,7 @@ class StudentCreate(generic.CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        #login(self.request, user)
-        #return redirect('app:list')。
-    
-        #user = form.save(commit=False)
+
         user.is_active = False
         user.save()
 
@@ -216,10 +175,7 @@ class CompanyCreate(generic.CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        #login(self.request, user)
-        #return redirect('app:list')。
-    
-        #user = form.save(commit=False)
+
         user.is_active = False
         user.save()
 
@@ -296,83 +252,123 @@ def goodfunc(request, pk):
     return redirect('app:student_home')
 
 
-
-
-# 以下使わないが、念のため残しておく。
-'''
-def loginfunc(request):
-    if request.method == 'POST':
-        print(request.POST)
-        username2 = request.POST['username']
-        password2 = request.POST['password']
-        user = authenticate(request, email=username2, password=password2)
-
-        if user is not None:
-            login(request, user)
-            return render(request,'list.html')
-        
-        else:
-            return redirect('login')
-
-    return render(request, 'login.html')
-
-def home(request):
-    if request.user.is_authenticated:
-        if request.user.is_teacher:
-            return redirect('app:list')
-        else:
-            return redirect('app:list')
-    return render(request, 'select.html')
-
-class Login(LoginView):
-    """ログインページ"""
-    form_class = LoginForm
-    template_name = 'login.html'
-
-def create_user(request):
-    if request.method == 'POST':
-        #username = request.POST['username']
-        #password = request.POST['password']
-        user_form = UserCreateForm(request.POST)
-        student_form = StudentCreateForm(request.POST)
-        print('1')
-
-        print(user_form.is_valid())
-        print(student_form.is_valid())
-        if  user_form.is_valid() and student_form.is_valid():
-            user = user_form.save()
-            #student = student_form.save()
-            #student.user = user
-            #student.save()
-            print('3')
-            return redirect('app:list')
-    else:
-        user_form = UserCreateForm()
-        student_form = StudentCreateForm()
-        print('4')
-    print('5')
-    return render(
-        request,
-        'signup2.html',
-        {'user_form': user_form, 'student_form': student_form}
-    )
-
-def signupfunc(request):
-  if request.method =='POST':
-    username2 = request.POST['username']
-    password2 = request.POST['password']
-    try:
-      User.objects.get(username=username2)
-      return render(request, 'signup.html', {'error':'このユーザーは登録されています'})
-    except:
-      user = User.objects.create_user(username, '', password2)
-      return render(request, 'signup.html', {'some':100})
-  return render(request, 'signup.html', {'some':100})
-
+# Studentユーザに対するSocietyアカウントの一覧表示
 @login_required
-def listfunc(request):
-    object_list = BoardModel.objects.all()
-    return render(request, 'list.html', {'object_list':object_list})
-   #return render(request, 'list.html')
+@student_required
+def view_societies(request):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    return render(request, 'society_list.html', {'society_list':society_list})
 
-'''
+
+# Studentユーザに対する各Societyアカウントの詳細表示
+@login_required
+@student_required
+def detail_society(request, pk):
+    society = User.objects.get(pk=pk)
+    return render(request, 'detail_society.html', {'society':society})
+
+
+# Studentのプロフィールに必要
+class OnlyYouMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        user = self.request.user
+        return user.pk == self.kwargs['pk'] or user.is_superuser
+
+
+
+# Studentのプロフィール表示
+# Studentのプロフィール表示を関数として自分で書いてみる
+@login_required
+@student_required
+def student_profile(request, pk):
+    student = User.objects.get(pk=pk)
+    connection = Connection.objects.all()
+    following = []
+    for i in range(len(connection)):
+        if connection[i].follower.username == student.username:
+            following.append(connection[i].following)
+    #print(following[0].society_name)
+    return render(request, 'student_profile.html', {'student':student, 'following':following})
+
+
+
+# フォロー
+@login_required
+@student_required
+def follow_view(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        #follower = User.objects.get(username=request.user.username)
+        follower = User.objects.get(email=request.user.email)
+        #print(request.user.email)
+        #print(kwargs)
+        #print("hello")
+        #following = User.objects.get(username=kwargs['username'])
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        return render(request, 'society_list.html', {'society_list':society_list})
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            #print("hello")
+            #print(follower.following_number)
+            follower.following_number += 1
+            #print(follower.following_number)
+            following.followers_number += 1
+            messages.success(request, '{}をフォローしました'.format(following.username))
+        else:
+            messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return render(request, 'society_list.html', {'society_list':society_list})
+
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_view(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        #follower = User.objects.get(username=request.user.username)
+        #following = User.objects.get(username=kwargs['username'])
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower == following:
+            messages.warning(request, '自分自身のフォローを外せません')
+        else:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            follower.following_number -= 1
+            following.followers_number -= 1
+            messages.success(request, 'あなたは{}のフォローを外しました'.format(following.username))
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        return render(request, 'society_list.html', {'society_list':society_list})
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return render(request, 'society_list.html', {'society_list':society_list})
