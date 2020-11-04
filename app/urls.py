@@ -28,19 +28,12 @@ urlpatterns = [
     path('view_societies/',view_societies,name='view_societies'),
     path('detail_society/<int:pk>',detail_society,name='detail_society'),
 
-    #path('detail/<int:pk>', detailfunc, name='detail'),
     path('good/<int:pk>', goodfunc, name='good'),
 
     path('student_profile/<int:pk>', student_profile, name='student_profile'),
-    #path('<slug:username>', views.StudentProfileDetailView.as_view(), name='profile'),
-    #path('profile/<email>', views.StudentProfileDetailView.as_view(), name='profile'),
-    #path('<slug:username>/edit', views.StudentProfileUpdateView.as_view(), name='edit'),
-    #path('student_profile/<int:pk>', views.StudentProfile.as_view(), name='student_profile'),
 
     path('follow/<email>', views.follow_view, name='follow'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
-    #path('<slug:username>/follow', views.follow_view, name='follow'),
-    #path('<slug:username>/unfollow', views.unfollow_view, name='unfollow'),
 
     # nagaya_develop_branchの変更箇所
     path('detail/', views.detailfunc, name='detailfun'), # views.pyのdetailfuncを参照
