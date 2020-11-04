@@ -112,4 +112,5 @@ class CompanyCreateForm(UserCreationForm):
 class PostAddForm(forms.ModelForm):
     class Meta:
         model = BoardModel # model変数にBoardModelを代入
-        fields = ['title', 'content', 'author', 'images', 'good', 'read', 'readtext'] # fields変数にフォームで使用するラベルと代入
+        #fields = ['title', 'content', 'author', 'images', 'good', 'read', 'readtext'] # fields変数にフォームで使用するラベルと代入
+        fields = ['title', 'content', 'images']

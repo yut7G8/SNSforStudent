@@ -42,7 +42,7 @@ urlpatterns = [
     #path('<slug:username>/follow', views.follow_view, name='follow'),
     #path('<slug:username>/unfollow', views.unfollow_view, name='unfollow'),
 
-    path('detail/', detailfunc, name='detailfunc'), # views.pyのdetailfuncを参照
+    #path('detail/', detailfunc, name='detailfunc'), # views.pyのdetailfuncを参照
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage
     path('add/', views.add, name='add'), # 投稿フォーム用のpath(仮)設定

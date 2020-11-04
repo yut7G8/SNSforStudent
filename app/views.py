@@ -86,7 +86,7 @@ def society_home(request):
     #return render(request,'society_home.html')
     #return render(request,'detail.html')
     object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
-    return render(request, 'detail.html', {'object':object})
+    return render(request, 'society_home.html', {'object':object})
 
 
 # CompanyUserのhome画面
@@ -254,6 +254,7 @@ def everypost(request, post_id): # urls.pyから送られてくるrequestとever
     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
     user = request.user
     #print(request.user.is_society)
+    #print(post.author)
     return render(request, 'everypost.html', {'post': post, 'user':user})
 
 
@@ -263,13 +264,18 @@ def everypost(request, post_id): # urls.pyから送られてくるrequestとever
 def add(request):
    if request.method == "POST":
       form = PostAddForm(request.POST, request.FILES)
+      print(1)
       if form.is_valid():
         post = form.save(commit=False)
         post.user = request.user
+        post.author = request.user.society_name
+        #print(post.author)
         post.save()
+        print(2)
         return redirect('app:society_home')
    else:   
        form = PostAddForm()
+       print(3)
    return render(request, 'add.html', {'form': form})
 
 

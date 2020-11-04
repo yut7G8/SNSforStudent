@@ -13,6 +13,7 @@
           <div class="col-sm-8 col-md-7 py-4">
             <h4 class="text-white">Menu</h4>
             <ul class="list-unstyled">
+                <li><a href="{%url 'app:society_home'%}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
                 <li><a href="{% url 'app:add' %}" class="text-white">投稿する</a></li>
@@ -53,7 +54,7 @@
         {{ form.images }}
  </div>
  
- <label for="id_author" class="sr-only">author</label>
+ <!--<label for="id_author" class="sr-only">author</label>
  <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
  
  <div class="mb-3 form-control text-secondary">
@@ -68,7 +69,7 @@
  
  <div class="mb-3 form-control text-secondary">
   <label>readtext</label>
-      {{ form.readtext }}
+      {{ form.readtext }}-->
  </div>
  
  <button type="submit" class="btn btn-block btn-outline-success">投稿する</button>
