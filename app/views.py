@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login,logout, update_session_auth_
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import redirect,render
+from django.shortcuts import redirect,render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
