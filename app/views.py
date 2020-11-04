@@ -283,17 +283,19 @@ def add(request):
 @society_required
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit(request, post_id):
-   post = get_object_or_404(BoardModel, id=post_id)
-   #print(post.user.username)
-   #print(request.user.username)
-   if request.method == "POST":
-       form = PostAddForm(request.POST, request.FILES, instance=post)
-       if form.is_valid():
-           form.save()
-           return redirect('app:everypost', post_id=post.id)
-   else:
-       form = PostAddForm(instance=post)
-   return render(request, 'edit.html', {'form': form, 'post':post })
+    post = get_object_or_404(BoardModel, id=post_id)
+    #print(post.user.username)
+    #print(request.user.username)
+    if(post.user.username==request.user.username):
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES, instance=post)
+            if form.is_valid():
+                form.save()
+                return redirect('app:everypost', post_id=post.id)
+        else:
+            form = PostAddForm(instance=post)
+        return render(request, 'edit.html', {'form': form, 'post':post })
+    return redirect('app:select')
 
 
 # 削除フォーム用のdelete関数
