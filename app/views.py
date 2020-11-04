@@ -86,8 +86,10 @@ def society_home(request):
     #return render(request,'society_home.html')
     #return render(request,'detail.html')
     object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
-    return render(request, 'society_home.html', {'object':object})
-
+    if (request.user == BoardModel.objects.order_by('user')):
+        return render(request, 'society_home.html', {'object':object})
+    else:
+        return redirect('app:select')
 
 # CompanyUserのhome画面
 @login_required
@@ -286,7 +288,7 @@ def edit(request, post_id):
     post = get_object_or_404(BoardModel, id=post_id)
     #print(post.user.username)
     #print(request.user.username)
-    if(post.user.username==request.user.username):
+    if(post.user.username==request.user.username): # 投稿者のみが編集できるように設定
         if request.method == "POST":
             form = PostAddForm(request.POST, request.FILES, instance=post)
             if form.is_valid():
@@ -295,7 +297,8 @@ def edit(request, post_id):
         else:
             form = PostAddForm(instance=post)
         return render(request, 'edit.html', {'form': form, 'post':post })
-    return redirect('app:select')
+    else:
+        return redirect('app:select')
 
 
 # 削除フォーム用のdelete関数
@@ -304,8 +307,11 @@ def edit(request, post_id):
 @society_required
 def delete(request, post_id):
    post = get_object_or_404(BoardModel, id=post_id)
-   post.delete()
-   return redirect('app:society_home')
+   if(post.user.username==request.user.username): # 投稿者のみが削除できるように設定
+       post.delete()
+       return redirect('app:society_home')
+   else:
+       return redirect('app:select') 
 
 
 # # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
