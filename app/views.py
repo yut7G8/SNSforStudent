@@ -52,7 +52,7 @@ def loginfunc(request):
             if user_login.is_student:
                 return redirect('app:student_home')
             if user_login.is_society:
-                return redirect('app:society_home')
+                return redirect('app:detailfun')
             if user_login.is_company:
                 return redirect('app:company_home')
         else:
