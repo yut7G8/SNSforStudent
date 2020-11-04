@@ -284,6 +284,8 @@ def add(request):
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit(request, post_id):
    post = get_object_or_404(BoardModel, id=post_id)
+   #print(post.user.username)
+   #print(request.user.username)
    if request.method == "POST":
        form = PostAddForm(request.POST, request.FILES, instance=post)
        if form.is_valid():
