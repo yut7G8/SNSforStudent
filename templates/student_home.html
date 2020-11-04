@@ -56,29 +56,25 @@
     {% endif%}
     <!-- 検索結果の数 -->
 
-    {% for item in object_list %}
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card mb-4 shadow-sm">
-          <!--<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Student</text></svg>-->
-          <br>
-          <p><img src="{{item.images.url}}" height="225" style="display: block; margin: auto;"></p>
-          <div class="card-body">
-            <!--<p class="card-text">This page is for students.</p>-->
-            <p><a href="{%url 'app:detail' item.pk %}">{{item.title}}</a></p>
-            <p>投稿者：{{item.author}}</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <!--<button type="button" href="{%url 'app:good' item.pk %}" class="btn btn-sm btn-outline-secondary" aria-pressed="true">good:{{item.good}}</button>-->
-                <a href="{%url 'app:good' item.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">good：{{item.good}}</a>
-                <button type="button" href="#" class="btn btn-sm btn-outline-secondary">Edit</butto>
-              </div>
-              <small class="text-muted">9 mins</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1 class="mt-5 pt-4 text-center">学生用投稿一覧</h1>
+    <div class="d-flex justify-content-center flex-wrap">
+    {% for post in object_list %}
+    <a href="{% url 'app:everypost' post_id=post.id %}">
+    <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
+      {% if post.images %}
+        <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+      {% else %}
+        <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
+      {% endif %}
+      <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
+      <p class="card-text">
+      　{{ post.content|truncatechars:17 }}
+      </p>
+      <p>投稿者　{{post.author}}</p>
+      <!-- <p>{{post.good}}</p>
+      <p>{{post.read}}</p> -->
+      <p>{{post.readtext}}</p>
+    </a>
     {% endfor %}
 
   </div>

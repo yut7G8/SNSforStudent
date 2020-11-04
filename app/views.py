@@ -12,7 +12,7 @@ from django.shortcuts import redirect,render, get_object_or_404
 from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
-    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm
+    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -83,7 +83,10 @@ def student_home(request):
 @login_required
 @society_required
 def society_home(request):
-    return render(request,'society_home.html')
+    #return render(request,'society_home.html')
+    #return render(request,'detail.html')
+    object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
+    return render(request, 'detail.html', {'object':object})
 
 
 # CompanyUserのhome画面
@@ -238,10 +241,67 @@ class UserCreateComplete(generic.TemplateView):
         return HttpResponseBadRequest()
 
 
+@login_required
 # 各投稿の詳細ページに飛ぶ
 def detailfunc(request, pk):
-    object = BoardModel.objects.get(pk=pk)
+    #object = BoardModel.objects.get(pk=pk)
+    object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
     return render(request, 'detail.html', {'object':object})
+
+
+# 各BoardModelを参照するため用のdetail関数を用意
+def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
+    post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
+    user = request.user
+    #print(request.user.is_society)
+    return render(request, 'everypost.html', {'post': post, 'user':user})
+
+
+@login_required
+@society_required
+# 投稿フォーム用のadd関数
+def add(request):
+   if request.method == "POST":
+      form = PostAddForm(request.POST, request.FILES)
+      if form.is_valid():
+        post = form.save(commit=False)
+        post.user = request.user
+        post.save()
+        return redirect('app:society_home')
+   else:   
+       form = PostAddForm()
+   return render(request, 'add.html', {'form': form})
+
+
+@login_required
+@society_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   if request.method == "POST":
+       form = PostAddForm(request.POST, request.FILES, instance=post)
+       if form.is_valid():
+           form.save()
+           return redirect('app:everypost', post_id=post.id)
+   else:
+       form = PostAddForm(instance=post)
+   return render(request, 'edit.html', {'form': form, 'post':post })
+
+
+# 削除フォーム用のdelete関数
+# 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
+@login_required
+@society_required
+def delete(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   post.delete()
+   return redirect('app:society_home')
+
+
+# # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
+# def everypostforStuednt(request, post_id):
+#     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
+#     return render(request, 'everypostforStudent.html', {'post': post})
 
 
 # いいね機能の実装
