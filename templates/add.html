@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block header %}
+<header>
+    <div class="collapse bg-dark" id="navbarHeader">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-8 col-md-7 py-4">
+            <h4 class="text-white">Menu</h4>
+            <ul class="list-unstyled">
+                <li><a href="{%url 'app:society_home'%}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{% url 'app:add' %}" class="text-white">投稿する</a></li>
+                <li><a href="#" class="text-white">ユーザー情報</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container d-flex justify-content-between">
+        <a href="#" class="navbar-brand d-flex align-posts-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <strong>学生向けSNS</strong>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+{% endblock header %}
+
+{% block content %}
+<h1 class="mt-5 pt-4 text-center">新規投稿</h1>
+<form action="{% url 'app:add' %}" method="POST" enctype="multipart/form-data">
+ {% csrf_token %}
+
+ <label for="id_title" class="sr-only">タイトル</label>
+ <input type="text" name="title" placeholder="タイトル" maxlength="50" class="form-control mb-3" required id="id_title">
+
+ <label for="id_content" class="sr-only">本文</label>
+ <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
+ 
+ <div class="mb-3 form-control text-secondary">
+    <label>画像</label>
+        {{ form.images }}
+ </div>
+ 
+ <!--<label for="id_author" class="sr-only">author</label>
+ <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
+ 
+ <div class="mb-3 form-control text-secondary">
+  <label>いいね(・∀・)ｲｲﾈ!!</label>
+      {{ form.good }}
+ </div>
+
+ <div class="mb-3 form-control text-secondary">
+  <label>閲覧数</label>
+      {{ form.read }}
+ </div>
+ 
+ <div class="mb-3 form-control text-secondary">
+  <label>readtext</label>
+      {{ form.readtext }}-->
+ </div>
+ 
+ <button type="submit" class="btn btn-block btn-outline-success">投稿する</button>
+</form>
+{% endblock %}
