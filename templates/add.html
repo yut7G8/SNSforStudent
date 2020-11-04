@@ -38,24 +38,39 @@
 {% endblock header %}
 
 {% block content %}
-<h1 class="mt-5 pt-4 text-center">サークル用投稿一覧</h1>
-<div class="d-flex justify-content-center flex-wrap">
-{% for post in object%}
-<a href="{% url 'app:everypost' post_id=post.id %}">
-<div class="card m-4" style="min-width: 300; max-height: 490;"></div>
- {% if post.images %}
-   <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}">
-  {% else %}
-   <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
- {% endif %}
- <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
- <p class="card-text">
-  {{ post.content|truncatechars:17 }}
- </p>
- <!-- <p>#{{post.author}}</p> -->
- <!-- <p>{{post.good}}</p>
- <p>{{post.read}}</p> -->
- <p>{{post.readtext}}</p>
-</a>
-{% endfor %}
+<h1 class="mt-5 pt-4 text-center">新規投稿</h1>
+<form action="{% url 'app:add' %}" method="POST" enctype="multipart/form-data">
+ {% csrf_token %}
+
+ <label for="id_title" class="sr-only">タイトル</label>
+ <input type="text" name="title" placeholder="タイトル" maxlength="50" class="form-control mb-3" required id="id_title">
+
+ <label for="id_content" class="sr-only">本文</label>
+ <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
+ 
+ <div class="mb-3 form-control text-secondary">
+    <label>画像</label>
+        {{ form.images }}
+ </div>
+ 
+ <label for="id_author" class="sr-only">author</label>
+ <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
+ 
+ <div class="mb-3 form-control text-secondary">
+  <label>いいね(・∀・)ｲｲﾈ!!</label>
+      {{ form.good }}
+ </div>
+
+ <div class="mb-3 form-control text-secondary">
+  <label>閲覧数</label>
+      {{ form.read }}
+ </div>
+ 
+ <div class="mb-3 form-control text-secondary">
+  <label>readtext</label>
+      {{ form.readtext }}
+ </div>
+ 
+ <button type="submit" class="btn btn-block btn-outline-success">投稿する</button>
+</form>
 {% endblock %}

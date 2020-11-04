@@ -127,16 +127,19 @@ class Company(models.Model):
 
 # 投稿用モデル
 class BoardModel(models.Model):
-
-    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
-    
-    title = models.CharField(max_length=100)
-    content = models.TextField()
+    title = models.CharField('タイトル', max_length=100)
+    content = models.TextField('本文')
     author = models.CharField(max_length=100)
-    images = models.ImageField(upload_to='')
+    images = models.ImageField('画像', upload_to='image', blank=True) # アップロード場所を変更
+    # created_at = models.DateTimeField('投稿日', default=timezone.now)
     good = models.IntegerField()
     read = models.IntegerField()
     readtext = models.CharField(max_length=200)
+    # tag = models.ForeignKey(Tag, verbose_name = 'タグ', on_delete=models.PROTECT) # TagクラスとBoardModleの紐づけ
+    # user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
 
 
 # フォロー

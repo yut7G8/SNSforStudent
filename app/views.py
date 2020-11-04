@@ -238,11 +238,61 @@ class UserCreateComplete(generic.TemplateView):
         return HttpResponseBadRequest()
 
 
+# nagaya_develop_branchの変更箇所
 # 各投稿の詳細ページに飛ぶ
-def detailfunc(request, pk):
-    object = BoardModel.objects.get(pk=pk)
+def detailfunc(request):
+    object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
     return render(request, 'detail.html', {'object':object})
 
+# 各BoardModelを参照するため用のdetail関数を用意
+def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
+    post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
+    return render(request, 'everypost.html', {'post': post})
+
+@login_required
+@society_required
+# 投稿フォーム用のadd関数
+def add(request):
+   if request.method == "POST":
+      form = PostAddForm(request.POST, request.FILES)
+      if form.is_valid():
+        post = form.save(commit=False)
+        post.user = request.user
+        post.save()
+        return redirect('app:detailfun')
+   else:   
+       form = PostAddForm()
+   return render(request, 'add.html', {'form': form})
+
+@login_required
+@society_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   if request.method == "POST":
+       form = PostAddForm(request.POST, request.FILES, instance=post)
+       if form.is_valid():
+           form.save()
+           return redirect('app:everypost', post_id=post.id)
+   else:
+       form = PostAddForm(instance=post)
+   return render(request, 'edit.html', {'form': form, 'post':post })
+
+# 削除フォーム用のdelete関数
+# 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
+
+@login_required
+@society_required
+def delete(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   post.delete()
+   return redirect('app:detailfun')
+
+# # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
+# def everypostforStuednt(request, post_id):
+#     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
+#     return render(request, 'everypostforStudent.html', {'post': post})
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # いいね機能の実装
 def goodfunc(request, pk):
