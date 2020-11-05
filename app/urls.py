@@ -21,11 +21,11 @@ urlpatterns = [
     path('user_create/done', views.UserCreateDone.as_view(), name='user_create_done'),
     path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
     
-    path('student_home/',student_home,name='student_home'),
+    path('student_home/<int:pk>',student_home,name='student_home'),
     path('society_home',society_home,name='society_home'),
     path('company_home',company_home,name='company_home'),
 
-    path('view_societies/',view_societies,name='view_societies'),
+    path('view_societies/<int:pk>',view_societies,name='view_societies'),
     path('detail_society/<int:pk>',detail_society,name='detail_society'),
 
     #path('detail/<int:pk>', detailfunc, name='detail'),
@@ -38,6 +38,7 @@ urlpatterns = [
     #path('student_profile/<int:pk>', views.StudentProfile.as_view(), name='student_profile'),
 
     path('follow/<email>', views.follow_view, name='follow'),
+    path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
     #path('<slug:username>/follow', views.follow_view, name='follow'),
     #path('<slug:username>/unfollow', views.unfollow_view, name='unfollow'),

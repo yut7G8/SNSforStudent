@@ -50,7 +50,7 @@ def loginfunc(request):
         if user is not None:
             login(request, user_login)
             if user_login.is_student:
-                return redirect('app:student_home')
+                return redirect('app:student_home', pk=user.pk)
             if user_login.is_society:
                 return redirect('app:society_home')
             if user_login.is_company:
@@ -64,19 +64,31 @@ def loginfunc(request):
 # StudentUserのhome画面
 @login_required
 @student_required
-def student_home(request):
-    query = request.GET.get('q')
-    if query:
+def student_home(request, pk):
+    if request.user.pk == pk:
+        student = User.objects.get(pk=pk)
+        # ログインしたStudentユーザと結ぶついているConnection
+        connections = Connection.objects.filter(follower=student)
+        # 検索用に必要
         object_list = BoardModel.objects.all()
+        # 表示用のリスト(Queryの扱いが不自由で統一できなかった)
+        post_list = []
+        for connection in connections:
+            posts = BoardModel.objects.filter(user=connection.following)
+            for post in posts:
+                post_list.append(post)
 
-        object_list = object_list.filter(
-            Q(title__icontains=query) |
-            Q(author__icontains=query)
-        ).distinct()
+        query = request.GET.get('q')
+        if query:
 
+            post_list = object_list.filter(
+                Q(title__icontains=query) |
+                Q(author__icontains=query)
+            ).distinct()
+
+        return render(request, 'student_home.html', {'object_list':post_list,'query': query})
     else:
-        object_list = BoardModel.objects.all()
-    return render(request, 'student_home.html', {'object_list':object_list,'query': query})
+        return redirect('app:login')
 
 
 # SocietyUserのhome画面
@@ -325,13 +337,22 @@ def goodfunc(request, pk):
 # Studentユーザに対するSocietyアカウントの一覧表示
 @login_required
 @student_required
-def view_societies(request):
-    user_list = User.objects.all()
-    society_list = []
-    for user in user_list:
-        if user.is_society:
-            society_list.append(user)
-    return render(request, 'society_list.html', {'society_list':society_list})
+def view_societies(request, pk):
+    # ユーザ制限
+    if request.user.pk == pk:
+        # Societyアカウントのみ取得
+        user_list = User.objects.filter(is_society=True)
+        society_list = []
+        for society in user_list:
+            connections = Connection.objects.filter(following=society)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    society.created=True
+            society_list.append(society)
+        #print(society_list[0][0].pk)
+        return render(request, 'society_list.html', {'society_list':society_list})
+    else:
+        return redirect('app:login')
 
 
 # Studentユーザに対する各Societyアカウントの詳細表示
@@ -358,13 +379,16 @@ class OnlyYouMixin(UserPassesTestMixin):
 @student_required
 def student_profile(request, pk):
     student = User.objects.get(pk=pk)
-    connection = Connection.objects.all()
-    following = []
-    for i in range(len(connection)):
-        if connection[i].follower.username == student.username:
-            following.append(connection[i].following)
-    #print(following[0].society_name)
-    return render(request, 'student_profile.html', {'student':student, 'following':following})
+    if request.user.pk == pk:
+        connection = Connection.objects.all()
+        following = []
+        for i in range(len(connection)):
+            if connection[i].follower.username == student.username:
+                following.append(connection[i].following)
+        #print(following[0].society_name)
+        return render(request, 'student_profile.html', {'student':student, 'following':following})
+    else:
+        return redirect('app:login')
 
 
 
@@ -373,17 +397,10 @@ def student_profile(request, pk):
 @student_required
 def follow_view(request, *args, **kwargs):
     user_list = User.objects.all()
-    society_list = []
-    for user in user_list:
-        if user.is_society:
-            society_list.append(user)
     try:
-        #follower = User.objects.get(username=request.user.username)
+        # Student
         follower = User.objects.get(email=request.user.email)
-        #print(request.user.email)
-        #print(kwargs)
-        #print("hello")
-        #following = User.objects.get(username=kwargs['username'])
+        # Society
         following = User.objects.get(email=kwargs['email'])
     except User.DoesNotExist:
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
@@ -396,17 +413,51 @@ def follow_view(request, *args, **kwargs):
         _, created = Connection.objects.get_or_create(follower=follower, following=following)
 
         if (created):
-            #print("hello")
-            #print(follower.following_number)
+            # Studentのフォローしている数を増やす
             follower.following_number += 1
-            #print(follower.following_number)
+            follower.save()
+            # Societyのフォローされている数を増やす
             following.followers_number += 1
+            following.save()
             messages.success(request, '{}をフォローしました'.format(following.username))
         else:
             messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return render(request, 'society_list.html', {'society_list':society_list})
+    return redirect('app:view_societies' , pk=request.user.pk)
+
+@login_required
+@student_required
+def follow_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Society
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        return redirect('app:detail_society' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            messages.success(request, '{}をフォローしました'.format(following.username))
+        else:
+            messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return redirect('app:detail_society' , pk=request.user.pk)
 
 
 # アンフォロー
@@ -429,16 +480,22 @@ def unfollow_view(request, *args, **kwargs):
         else:
             unfollow = Connection.objects.get(follower=follower, following=following)
             unfollow.delete()
+            # Studentのフォローしている数を減らす
             follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
             following.followers_number -= 1
+            following.save()
             messages.success(request, 'あなたは{}のフォローを外しました'.format(following.username))
     except User.DoesNotExist:
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
-        return render(request, 'society_list.html', {'society_list':society_list})
+        #return render(request, 'society_list.html', {'society_list':society_list})
+        return redirect('app:student_profile', pk=request.user.pk)
         
     except Connection.DoesNotExist:
         messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return render(request, 'society_list.html', {'society_list':society_list})
+    #return render(request, 'society_list.html', {'society_list':society_list})
+    return redirect('app:student_profile', pk=request.user.pk)
