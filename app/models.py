@@ -60,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_society = models.BooleanField(default=False)
     is_company = models.BooleanField(default=False)
 
+    is_connected = models.BooleanField(default=False)
 
     is_staff = models.BooleanField(
         _('staff status'),
@@ -145,7 +146,9 @@ class BoardModel(models.Model):
 
 # フォロー
 class Connection(models.Model):
+    # student
     follower = models.ForeignKey(User, related_name='follower', on_delete=models.CASCADE)
+    # society
     following = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
