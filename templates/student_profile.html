@@ -76,7 +76,7 @@
                     <div class="card-body">
                         <!--<p class="card-text">This page is for students.</p>-->
                         <!--<p>サークル：{{society.society_name}}</p>-->
-                        <p><a href="{%url 'app:detail_society' society.pk %}">{{society.society_name}}</a></p>
+                        <p><a href="{%url 'app:detail_society' user.pk society.email %}">{{society.society_name}}</a></p>
                         <p>{{society.school_name}}</p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">

@@ -18,10 +18,10 @@
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
               {% elif user.is_society %}
-                <li><a href="{%url 'app:society_home'%}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
-                <li><a href="{% url 'app:add' %}" class="text-white">投稿する</a></li>
+                <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
                 {% endif %} 
             </ul>
@@ -55,7 +55,7 @@
    <div class="p-3">
    <p class="card-text">{{ post.content }}</p>
    {% if user.is_student %}
-   <a href="{%url 'app:detail_society' post.user.pk %}"><p>投稿者　{{post.author}}</p></a>
+   <a href="{%url 'app:detail_society' user.pk post.user.email %}"><p>投稿者　{{post.author}}</p></a>
    {% else %}
    <p>投稿者　{{post.author}}</p>
    {% endif %}

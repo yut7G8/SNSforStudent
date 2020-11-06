@@ -52,7 +52,7 @@ def loginfunc(request):
             if user_login.is_student:
                 return redirect('app:student_home', pk=user.pk)
             if user_login.is_society:
-                return redirect('app:society_home')
+                return redirect('app:society_home', pk=user.pk)
             if user_login.is_company:
                 return redirect('app:company_home')
         else:
@@ -94,11 +94,13 @@ def student_home(request, pk):
 # SocietyUserのhome画面
 @login_required
 @society_required
-def society_home(request):
-    #return render(request,'society_home.html')
-    #return render(request,'detail.html')
-    object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
-    return render(request, 'society_home.html', {'object':object})
+def society_home(request, pk):
+    #object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
+    if request.user.pk == pk:
+        posts = BoardModel.objects.filter(user=request.user)
+        return render(request, 'society_home.html', {'object':posts})
+    else:
+        return redirect('app:login')
 
 
 # CompanyUserのhome画面
@@ -273,22 +275,21 @@ def everypost(request, post_id): # urls.pyから送られてくるrequestとever
 @login_required
 @society_required
 # 投稿フォーム用のadd関数
-def add(request):
-   if request.method == "POST":
-      form = PostAddForm(request.POST, request.FILES)
-      print(1)
-      if form.is_valid():
-        post = form.save(commit=False)
-        post.user = request.user
-        post.author = request.user.society_name
-        #print(post.author)
-        post.save()
-        print(2)
-        return redirect('app:society_home')
-   else:   
-       form = PostAddForm()
-       print(3)
-   return render(request, 'add.html', {'form': form})
+def add(request, pk):
+    if request.user.pk == pk:
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.author = request.user.society_name
+                post.save()
+                return redirect('app:society_home', pk=request.user.pk)
+        else:   
+            form = PostAddForm()
+        return render(request, 'add.html', {'form': form})
+    else:
+        return redirect('app:login')
 
 
 @login_required
@@ -317,7 +318,7 @@ def edit(request, post_id):
 def delete(request, post_id):
    post = get_object_or_404(BoardModel, id=post_id)
    post.delete()
-   return redirect('app:society_home')
+   return redirect('app:society_home', pk=request.user.pk)
 
 
 # # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
@@ -358,9 +359,16 @@ def view_societies(request, pk):
 # Studentユーザに対する各Societyアカウントの詳細表示
 @login_required
 @student_required
-def detail_society(request, pk):
-    society = User.objects.get(pk=pk)
-    return render(request, 'detail_society.html', {'society':society})
+def detail_society(request, pk, **kwargs):
+    if request.user.pk == pk:
+        society = User.objects.get(email=kwargs['email'])
+        connections = Connection.objects.filter(following=society)
+        for connection in connections:
+            if(connection.follower==request.user):
+                society.created=True
+        return render(request, 'detail_society.html', {'society':society})
+    else:
+        return redirect('app:login')
 
 
 # Studentのプロフィールに必要
@@ -405,7 +413,8 @@ def follow_view(request, *args, **kwargs):
     except User.DoesNotExist:
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
-        return render(request, 'society_list.html', {'society_list':society_list})
+        #return render(request, 'society_list.html', {'society_list':society_list})
+        return redirect('app:view_societies' , pk=request.user.pk)
 
     if follower == following:
         messages.warning(request, '自分自身はフォローできませんよ')
@@ -457,7 +466,7 @@ def follow_from_detail(request, *args, **kwargs):
             messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return redirect('app:detail_society' , pk=request.user.pk)
+    return redirect('app:detail_society' , pk=request.user.pk, email=following.email)
 
 
 # アンフォロー

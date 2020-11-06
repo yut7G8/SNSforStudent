@@ -60,7 +60,7 @@ class StudentCreateForm(UserCreationForm):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('first_name', 'last_name', 'email', )
+        fields = ('first_name', 'last_name', 'school_name', 'grade', 'email', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

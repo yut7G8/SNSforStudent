@@ -22,11 +22,11 @@ urlpatterns = [
     path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
     
     path('student_home/<int:pk>',student_home,name='student_home'),
-    path('society_home',society_home,name='society_home'),
+    path('society_home/<int:pk>',society_home,name='society_home'),
     path('company_home',company_home,name='company_home'),
 
     path('view_societies/<int:pk>',view_societies,name='view_societies'),
-    path('detail_society/<int:pk>',detail_society,name='detail_society'),
+    path('detail_society/<int:pk>/<email>',detail_society,name='detail_society'),
 
     #path('detail/<int:pk>', detailfunc, name='detail'),
     path('good/<int:pk>', goodfunc, name='good'),
@@ -46,7 +46,7 @@ urlpatterns = [
     #path('detail/', detailfunc, name='detailfunc'), # views.pyのdetailfuncを参照
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage
-    path('add/', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
+    path('add/<int:pk>', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
     path('edit/<int:post_id>/', views.edit, name='edit'), # 編集機能の追加
     path('delete/<int:post_id>/', views.delete, name='delete'), # 削除機能の追加
 ]
