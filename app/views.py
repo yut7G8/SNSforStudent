@@ -86,10 +86,10 @@ def society_home(request):
     #return render(request,'society_home.html')
     #return render(request,'detail.html')
     object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
-    if (request.user == BoardModel.objects.order_by('user')):
-        return render(request, 'society_home.html', {'object':object})
-    else:
-        return redirect('app:select')
+    # if (request.user == BoardModel.objects.order_by('user')):
+    return render(request, 'society_home.html', {'object':object})
+    # else:
+    #     return redirect('app:add')
 
 # CompanyUserのhome画面
 @login_required
