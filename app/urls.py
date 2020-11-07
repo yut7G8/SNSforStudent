@@ -32,6 +32,7 @@ urlpatterns = [
     path('good/<int:pk>', goodfunc, name='good'),
 
     path('student_profile/<int:pk>', student_profile, name='student_profile'),
+    path('student_profile_update/<int:pk>',views.StudentProfileUpdate.as_view(),name='student_profile_update'),
     #path('<slug:username>', views.StudentProfileDetailView.as_view(), name='profile'),
     #path('profile/<email>', views.StudentProfileDetailView.as_view(), name='profile'),
     #path('<slug:username>/edit', views.StudentProfileUpdateView.as_view(), name='edit'),

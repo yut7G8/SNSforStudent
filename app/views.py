@@ -8,11 +8,11 @@ from django.contrib.auth import authenticate, login,logout, update_session_auth_
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import redirect,render, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
-    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm
+    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, StudentProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -397,6 +397,15 @@ def student_profile(request, pk):
         return render(request, 'student_profile.html', {'student':student, 'following':following})
     else:
         return redirect('app:logout')
+
+
+class StudentProfileUpdate(OnlyYouMixin, generic.UpdateView):
+    model = User
+    form_class = StudentProfileUpdateForm
+    template_name = 'student_profile_update.html'
+
+    def get_success_url(self):
+        return resolve_url('app:student_profile', pk=self.kwargs['pk'])
 
 
 
