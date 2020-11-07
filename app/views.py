@@ -88,7 +88,7 @@ def student_home(request, pk):
 
         return render(request, 'student_home.html', {'object_list':post_list,'query': query})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 # SocietyUserのhome画面
@@ -100,7 +100,7 @@ def society_home(request, pk):
         posts = BoardModel.objects.filter(user=request.user)
         return render(request, 'society_home.html', {'object':posts})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 # CompanyUserのhome画面
@@ -289,7 +289,7 @@ def add(request, pk):
             form = PostAddForm()
         return render(request, 'add.html', {'form': form})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 @login_required
@@ -353,7 +353,7 @@ def view_societies(request, pk):
         #print(society_list[0][0].pk)
         return render(request, 'society_list.html', {'society_list':society_list})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 # Studentユーザに対する各Societyアカウントの詳細表示
@@ -368,7 +368,7 @@ def detail_society(request, pk, **kwargs):
                 society.created=True
         return render(request, 'detail_society.html', {'society':society})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 # Studentのプロフィールに必要
@@ -396,7 +396,7 @@ def student_profile(request, pk):
         #print(following[0].society_name)
         return render(request, 'student_profile.html', {'student':student, 'following':following})
     else:
-        return redirect('app:login')
+        return redirect('app:logout')
 
 
 
