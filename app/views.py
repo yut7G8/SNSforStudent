@@ -308,7 +308,7 @@ def edit(request, post_id):
         else:
             form = PostAddForm(instance=post)
         return render(request, 'edit.html', {'form': form, 'post':post })
-    return redirect('app:select')
+    return redirect('app:logout')
 
 
 # 削除フォーム用のdelete関数
