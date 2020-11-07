@@ -50,4 +50,5 @@ urlpatterns = [
     path('add/<int:pk>', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
     path('edit/<int:post_id>/', views.edit, name='edit'), # 編集機能の追加
     path('delete/<int:post_id>/', views.delete, name='delete'), # 削除機能の追加
+    
 ]
