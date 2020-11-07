@@ -13,10 +13,10 @@
           <div class="col-sm-8 col-md-7 py-4">
             <h4 class="text-white">Menu</h4>
             <ul class="list-unstyled">
-                <li><a href="{%url 'app:student_home'%}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:student_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
-                <li><a href="{%url 'app:view_societies'%}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
             </ul>
           </div>
@@ -31,7 +31,7 @@
         </a>
         <!-- 検索フォーム -->
         <div class="d-flex justify-content-center">
-          <form class="form-inline my-2" method="GET" action="{% url 'app:student_home' %}">
+          <form class="form-inline my-2" method="GET" action="{% url 'app:student_home' user.pk %}">
           <input type="text" class="form-control" name="q" value="{{request.GET.q}}">
           <button type="submit" value="search" class="btn btn-outline-secondary">検索</button>
           </form>
@@ -85,7 +85,7 @@
                     <div class="card-body">
                         <!--<p class="card-text">This page is for students.</p>-->
                         <!--<p>サークル：{{society.society_name}}</p>-->
-                        <p><a href="{%url 'app:detail_society' society.pk %}">{{society.society_name}}</a></p>
+                        <p><a href="{%url 'app:detail_society' user.pk society.email %}">{{society.society_name}}</a></p>
                         <p>{{society.school_name}}</p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
