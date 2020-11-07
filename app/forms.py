@@ -60,7 +60,7 @@ class StudentCreateForm(UserCreationForm):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('first_name', 'last_name', 'email', )
+        fields = ('first_name', 'last_name', 'school_name', 'grade', 'email', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -107,4 +107,22 @@ class CompanyCreateForm(UserCreationForm):
         user.save()
         company = Company.objects.create(user=user)
         return user
+
+
+class StudentProfileUpdateForm(forms.ModelForm):
+    """studentのプロフィール更新用のフォーム定義"""
+    class Meta:
+        model = User
+        fields =['first_name', 'last_name', 'about_me', 'school_name', 'grade'] 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
     
+# 投稿用のフォームを作成
+class PostAddForm(forms.ModelForm):
+    class Meta:
+        model = BoardModel # model変数にBoardModelを代入
+        #fields = ['title', 'content', 'author', 'images', 'good', 'read', 'readtext'] # fields変数にフォームで使用するラベルと代入
+        fields = ['title', 'content', 'images']
