@@ -130,6 +130,23 @@ class PostAddForm(forms.ModelForm):
 
 # サークルユーザ用イベント作成フォーム
 class CreateEventForm(forms.ModelForm):
+    #event_date = forms.SplitDateTimeField(label='作成日')
     class Meta:
         model = Event
-        fields = ['event_name', 'content']
+        fields = ['event_name', 'content', 'event_date']
+        #widgets = {
+            #'event_date': forms.SelectDateWidget
+        #}
+
+
+# サークルユーザ用イベント編集フォーム
+class EditEventForm(forms.ModelForm):
+
+    class Meta:
+        model = Event
+        fields =['event_name', 'content', 'event_date']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'

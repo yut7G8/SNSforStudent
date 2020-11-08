@@ -26,7 +26,7 @@
     </div>
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
-        <a href="#" class="navbar-brand d-flex align-posts-center">
+        <a href="#" class="navbar-brand d-flex align-items-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           <strong>学生向けSNS</strong>
         </a>
@@ -36,26 +36,22 @@
       </div>
     </div>
   </header>
-
 {% endblock header %}
 
 {% block content %}
-<h1 class="mt-5 pt-4 text-center">イベント作成</h1>
-<form action="{% url 'app:create_event' user.pk %}" method="POST" enctype="multipart/form-data">
- {% csrf_token %}
-
- <label for="id_title" class="sr-only">イベント名</label>
- <input type="text" name="event_name" placeholder="イベント名" maxlength="50" class="form-control mb-3" required id="id_event_name">
-
- <label for="id_content" class="sr-only">本文</label>
- <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
- 
- <div style="text-align: center;">
- <label for="id_event_date" class="sr-only">開催日時</label>
- <input type="datetime-local" name="event_date" placeholder="開催日時" required id="id_event_date">
- </div>
- <br>
-
- <button type="submit" class="btn btn-block btn-outline-success">作成する</button>
+<form action="" method="POST">
+    {{ form.non_field_errors }}
+    <table class="table">
+        <tbody>
+            {% for field in form %}
+                <tr>
+                    <th><label for="{{ field.id_for_label }}">{{ field.label }}</label></th>
+                    <td>{{ field }} {{ field.errors }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success btn-lg" >送信</button>
 </form>
 {% endblock %}

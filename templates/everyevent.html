@@ -22,7 +22,7 @@
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li> 
-                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント/a></li> 
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</li> 
                 <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
                 {% endif %} 
@@ -52,15 +52,23 @@
    <h3 class="card-title font-weight-bold text-center">{{ event.event_name }}</h3>
    <div class="p-3">
    <p class="card-text">{{ event.content }}</p>
+   <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}}</p>
 
   {% if user.is_student %}
       <p>サークル: </sa-kuru><a href="{%url 'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
       {% if event.joined %}
         <p>あなたはすでにこのイベントに申し込み済です。</p>
+        <div style="text-align: center;">
+          <div class="btn-group">
+            <a href="{%url 'app:cancel_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加キャンセル</a>
+          </div>
+        </div>
       {% else%}
+      <div style="text-align: center;">
         <div class="btn-group">
           <a href="{%url 'app:join_event_confirm' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加フォームへ</a>
         </div>
+      </div>
       {% endif%}
 
   {% elif user.is_society %}
@@ -98,9 +106,23 @@
     </table>
 
    </div>
-  {% endif %}
+  </div>
 
+ <br>
+  <div style="text-align: center;">
+   <div class="btn-group">
+     <a href="{%url 'app:edit_event' event.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント編集</a>
+   </div>
  </div>
+
+  <br>
+  <div style="text-align: center;">
+   <div class="btn-group">
+     <a href="{%url 'app:delete_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント削除</a>
+   </div>
+ </div>
+ {% endif %}
+
 </div>
 </div>
 {% endblock %}

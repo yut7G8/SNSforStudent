@@ -167,10 +167,12 @@ class Event(models.Model):
     event_name = models.CharField(_('event name'), max_length=30, blank=True)
     # イベント内容
     content = models.TextField()
-    # 宣伝用写真
+    # 宣伝用画像
     images = models.ImageField(upload_to='')
     # イベント開催日
-    event_date = models.DateField(verbose_name="日付", default=datetime.now)
+    event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
+    # 申し込み締め切り日時
+    deadline = models.DateTimeField(verbose_name="締め切り日時", default=datetime.now)
 
     def __str__(self):
         return self.event_name
