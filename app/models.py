@@ -4,6 +4,7 @@ from django.contrib.auth.models import PermissionsMixin, UserManager
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from datetime import datetime
 
 from django.urls import reverse
 
@@ -154,3 +155,19 @@ class Connection(models.Model):
 
     def __str__(self):
         return "{} : {}".format(self.follower.username, self.following.username)
+
+
+# イベントクラス
+class Event(models.Model):
+    # 主催者(society)
+    society = models.ForeignKey(User, related_name='society', on_delete=models.CASCADE)
+    # 参加者(student)
+    students = models.ManyToManyField(User, related_name='joined_student')
+    # イベント名
+    event_name = models.CharField(_('event name'), max_length=30, blank=True)
+    # イベント内容
+    content = models.TextField()
+    # 宣伝用写真
+    images = models.ImageField(upload_to='')
+    # イベント開催日
+    event_date = models.DateField(verbose_name="日付", default=datetime.now)

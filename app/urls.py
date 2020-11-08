@@ -50,5 +50,9 @@ urlpatterns = [
     path('add/<int:pk>', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
     path('edit/<int:post_id>/', views.edit, name='edit'), # 編集機能の追加
     path('delete/<int:post_id>/', views.delete, name='delete'), # 削除機能の追加
+
+    path('create_cvent/<int:pk>', views.create_event, name='create_event'), # サークルユーザによるイベント作成
+    path('view_events/<int:pk>', views.view_events, name='view_events'), # 学生ユーザに対するイベント表示
+    path('join_event/<int:pk>/<int:id>/', views.join_event, name='join_event'), # 学生ユーザによるイベント参加
     
 ]

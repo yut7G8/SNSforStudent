@@ -16,7 +16,6 @@
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
-                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="{% url 'app:create_event' user.pk %}" class="text-white">イベント作成</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
@@ -27,7 +26,7 @@
     </div>
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
-        <a href="#" class="navbar-brand d-flex align-items-center">
+        <a href="#" class="navbar-brand d-flex align-posts-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           <strong>学生向けSNS</strong>
         </a>
@@ -37,41 +36,22 @@
       </div>
     </div>
   </header>
+
 {% endblock header %}
 
 {% block content %}
-<main role="main">
-  <div class="album py-5 bg-light">
-    <div class="container">
-      <!-- 検索結果の数 -->
-      {% if query %}
-      <p class="text-center font-weight-bold h4">検索結果は、{{object_list.count}}件</p>
-      {% endif%}
-      <!-- 検索結果の数 -->
-  
-      <h1 class="mt-5 pt-4 text-center">サークル用投稿一覧</h1>
-      <div class="d-flex justify-content-center flex-wrap">
-      {% for post in object %}
-      <a href="{% url 'app:everypost' post_id=post.id %}">
-      <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
-        {% if post.images %}
-          <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
-        {% else %}
-          <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
-        {% endif %}
-        <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
-        <p class="card-text">
-        　{{ post.content|truncatechars:17 }}
-        </p>
-        <p>投稿者　{{post.author}}</p>
-        <!-- <p>{{post.good}}</p>
-        <p>{{post.read}}</p> -->
-        <p>{{post.readtext}}</p>
-      </a>
-      {% endfor %}
-  
-    </div>
-  </div>
-  </main>
+<h1 class="mt-5 pt-4 text-center">イベント作成</h1>
+<form action="{% url 'app:create_event' user.pk %}" method="POST" enctype="multipart/form-data">
+ {% csrf_token %}
 
-{% endblock content %}
+ <label for="id_title" class="sr-only">イベント名</label>
+ <input type="text" name="event_name" placeholder="イベント名" maxlength="50" class="form-control mb-3" required id="id_event_name">
+
+ <label for="id_content" class="sr-only">本文</label>
+ <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
+ 
+ </div>
+ 
+ <button type="submit" class="btn btn-block btn-outline-success">作成する</button>
+</form>
+{% endblock %}
