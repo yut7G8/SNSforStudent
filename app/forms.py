@@ -4,7 +4,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, Student, Company, BoardModel
+from .models import User, Student, Company, BoardModel, Event
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -126,3 +126,10 @@ class PostAddForm(forms.ModelForm):
         model = BoardModel # model変数にBoardModelを代入
         #fields = ['title', 'content', 'author', 'images', 'good', 'read', 'readtext'] # fields変数にフォームで使用するラベルと代入
         fields = ['title', 'content', 'images']
+
+
+# サークルユーザ用イベント作成フォーム
+class CreateEventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['event_name', 'content']

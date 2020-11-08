@@ -26,7 +26,7 @@ urlpatterns = [
     path('company_home',company_home,name='company_home'),
 
     path('view_societies/<int:pk>',view_societies,name='view_societies'),
-    path('detail_society/<int:pk>/<email>',detail_society,name='detail_society'),
+    path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
 
     #path('detail/<int:pk>', detailfunc, name='detail'),
     path('good/<int:pk>', goodfunc, name='good'),
@@ -50,4 +50,11 @@ urlpatterns = [
     path('add/<int:pk>', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
     path('edit/<int:post_id>/', views.edit, name='edit'), # 編集機能の追加
     path('delete/<int:post_id>/', views.delete, name='delete'), # 削除機能の追加
+
+    path('create_cvent/<int:pk>', views.create_event, name='create_event'), # サークルユーザによるイベント作成
+    path('view_events/<int:pk>', views.view_events, name='view_events'), # 学生ユーザに対するイベント表示
+    path('everyevent/<int:pk>/<int:id>/', views.everyevent, name='everyevent'), # 各イベントの詳細表示
+    path('join_event_confirm/<int:pk>/<int:id>/', views.join_event_confirm, name='join_event_confirm'), # イベントの参加フォーム(確認画面へ)
+    path('join_event/<int:pk>/<int:id>/', views.join_event, name='join_event'), # 学生ユーザによるイベント参加
+    
 ]

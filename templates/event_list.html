@@ -13,12 +13,21 @@
           <div class="col-sm-8 col-md-7 py-4">
             <h4 class="text-white">Menu</h4>
             <ul class="list-unstyled">
-                <li><a href="{%url 'app:student_home' user.pk %}" class="text-white">top</a></li>              
+              {% if user.is_student %}
+                <li><a href="{%url 'app:student_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
-                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
                 <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
+              {% elif user.is_society %}
+                <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</a></li>
+                <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
+                <li><a href="#" class="text-white">ユーザー情報</a></li>
+                {% endif %} 
             </ul>
           </div>
         </div>
@@ -49,36 +58,40 @@
 
 {% block content %}
 <main role="main">
+<h1 class="mt-5 pt-4 text-center">イベント一覧</h1>
 <div class="album py-5 bg-light">
   <div class="container">
-    <!-- 検索結果の数 -->
-    {% if query %}
-    <p class="text-center font-weight-bold h4">検索結果は、{{object_list.count}}件</p>
-    {% endif%}
-    <!-- 検索結果の数 -->
+    {% for event in event_list %} 
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <br>
+                <div class="card-body">
+                    <p><a href="{%url 'app:everyevent' user.pk event.id %}">{{event.event_name}}</a></p>
+                    <p>{{event.content}}</p>
 
-    <h1 class="mt-5 pt-4 text-center">学生用投稿一覧</h1>
-    <div class="d-flex justify-content-center flex-wrap">
-    {% for post in object_list %}
-    
-    <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
-      {% if post.images %}
-        <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
-      {% else %}
-        <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
-      {% endif %}
-      <a href="{% url 'app:everypost' post_id=post.id %}">
-      <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
-      </a>
-      <p class="card-text">
-      　{{ post.content|truncatechars:17 }}
-      </p>
-      <p>投稿者　{{post.author}}</p>
-      <!-- <p>{{post.good}}</p>
-      <p>{{post.read}}</p> -->
-      <p>{{post.readtext}}</p>
-      
+                    {% if user.is_student %}
+                      <p>サークル: <a href="{%url  'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+                      <div class="d-flex justify-content-between align-items-center">
+                      {% if event.joined %}
+                        <div class="btn-group">
+                          <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">申し込み済み</a>
+                        </div>
+                      {% endif %}
+                     </div> 
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
     {% endfor %}
+  </div>
+
+  <div style="text-align: center;">
+    <div class="btn-group">
+      <a href="{%url 'app:create_event' user.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント作成</a>
+    </div>
   </div>
 </div>
 </main>

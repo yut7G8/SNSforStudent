@@ -16,6 +16,7 @@
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
               {% elif user.is_society %}
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
@@ -46,26 +47,20 @@
 {% block content %}   
 
 <div class="card text-secondary" style="margin-top: 55px;">
- {% if post.images %}
- <img style="width: 100%; max-height: 500;" class="img-fluid mx-auto" src="{{ post.images.url }}">
- {% else %}
- <div class="p-1 border border-secondary text-center pt-5" style="min-width: 500; min-height: 400;">No images</div>
- {% endif %}  <div class="card-body">
-   <h3 class="card-title font-weight-bold text-center">{{ post.title }}</h3>
+<div class="card-body">
+   <h3 class="card-title font-weight-bold text-center">確認画面</h3>
    <div class="p-3">
-   <p class="card-text">{{ post.content }}</p>
-   {% if user.is_student %}
-   <a href="{%url 'app:detail_society' user.pk post.user.id %}"><p>投稿者　{{post.author}}</p></a>
-   {% else %}
-   <p>投稿者　{{post.author}}</p>
-   {% endif %}
-   <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p>
-   <p>閲覧数　{{post.read}}</p>
-   <p>{{post.readtext}}</p>
-   {% if user.is_society %}
-    <a href="{% url 'app:edit' post_id=post.id %}"><button type="button" class="btn btn-outline-primary">編集</button></a>
-    <a href="{% url 'app:delete' post_id=post.id %}"><button type="button" class="btn btn-outline-danger">削除</button></a>
-   {% endif %}
+   <p class="card-text">あなたは
+       {{event.society.society_name}}
+       が主催する
+       {{ event.event_name }}
+       に参加しようとしています。
+       <br>
+       間違いなければ下の「参加する」ボタンを押してください。
+   </p>
+   <div class="btn-group">
+    <a href="{%url 'app:join_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加</a>
+   </div>
  </div>
 </div>
 </div>
