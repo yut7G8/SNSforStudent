@@ -171,3 +171,6 @@ class Event(models.Model):
     images = models.ImageField(upload_to='')
     # イベント開催日
     event_date = models.DateField(verbose_name="日付", default=datetime.now)
+
+    def __str__(self):
+        return self.event_name
