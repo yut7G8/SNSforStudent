@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
-    StudentProfileUpdateForm, CreateEventForm
+    StudentProfileUpdateForm, CreateEventForm, EditEventForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -539,7 +539,7 @@ def create_event(request, pk):
                 # イベントの主催者にログインユーザ(サークル)を登録
                 event.society = request.user
                 event.save()
-                return redirect('app:society_home', pk=request.user.pk)
+                return redirect('app:view_events', pk=request.user.pk)
         else:   
             form = CreateEventForm()
         return render(request, 'create_event.html', {'form': form})
@@ -589,29 +589,7 @@ def view_events(request, pk):
 
     # 不正アクセスに対するログアウト処理
     else:
-        return redirect('app:logout')
-
-
-@login_required
-@student_required
-# Studentユーザによるイベント参加
-def join_event(request, pk, id):
-    # ユーザ認証(url書き換えによるログイン偽装防止)
-    if request.user.pk == pk:
-        # ログインしたStudentユーザ情報取得
-        student = User.objects.get(pk=pk)
-        # 参加するイベント取得
-        event = Event.objects.get(id=id)
-        # イベント参加者にStudentユーザ追加
-        event.students.add(student)
-        # 変更内容保存
-        event.save()
-        # 確認
-        print(event.students.all())
-        return redirect('app:view_events', pk=request.user.pk)
-    else:
-        return redirect('app:logout')    
-
+        return redirect('app:logout')   
 
 
 @login_required
@@ -639,11 +617,10 @@ def everyevent(request, pk, id):
         elif user.is_society:
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
-
-    else:
-        return redirect('app:logout') 
+    return redirect('app:logout') 
         
 
+# Studentユーザへのイベント参加確認画面の表示
 def join_event_confirm(request, pk, id):
     # ユーザ認証(url書き換えによるログイン偽装防止)
     if request.user.pk == pk:
@@ -654,3 +631,69 @@ def join_event_confirm(request, pk, id):
 
     else:
         return redirect('app:logout') 
+
+
+@login_required
+@student_required
+# Studentユーザによるイベント参加
+def join_event(request, pk, id):
+    # ユーザ認証(url書き換えによるログイン偽装防止)
+    if request.user.pk == pk:
+        # ログインしたStudentユーザ情報取得
+        student = User.objects.get(pk=pk)
+        # 参加するイベント取得
+        event = Event.objects.get(id=id)
+        # イベント参加者にStudentユーザ追加
+        event.students.add(student)
+        # 変更内容保存
+        event.save()
+        # 確認
+        print(event.students.all())
+        return redirect('app:view_events', pk=request.user.pk)
+    else:
+        return redirect('app:logout') 
+
+
+@login_required
+@student_required
+# Studentユーザによるイベント参加キャンセル
+def cancel_event(request, pk, id):
+    if request.user.pk == pk:
+        # 該当イベント取得
+        event = get_object_or_404(Event, id=id)
+        students = event.students.all()
+        # イベント参加者からログインユーザを探し削除
+        for student in students:
+            if student == request.user:
+                event.students.remove(student)
+
+        #return redirect('app:everyevent', pk=request.user.pk, id=id)
+        return redirect('app:view_events', pk=request.user.pk)
+
+    else:
+        return redirect('app:logout')
+
+
+# Societyユーザによるイベントの編集
+class EditEvent(OnlyYouMixin, generic.UpdateView):
+    model = Event
+    form_class = EditEventForm
+    template_name = 'edit_event.html'
+
+    def get_success_url(self):
+        return resolve_url('app:view_events', pk=self.kwargs['pk'])
+
+
+# Societyユーザによるイベントの削除
+@login_required
+@society_required
+def delete_event(request, pk, id):
+    if request.user.pk == pk:
+        event = get_object_or_404(Event, id=id)
+        event.delete()
+        return redirect('app:view_events', pk=request.user.pk)
+
+    else:
+        return redirect('app:logout')
+
+

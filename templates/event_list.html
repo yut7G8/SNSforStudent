@@ -69,6 +69,7 @@
                 <div class="card-body">
                     <p><a href="{%url 'app:everyevent' user.pk event.id %}">{{event.event_name}}</a></p>
                     <p>{{event.content}}</p>
+                    <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}}</p>
 
                     {% if user.is_student %}
                       <p>サークル: <a href="{%url  'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
