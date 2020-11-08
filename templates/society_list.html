@@ -17,6 +17,7 @@
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{%url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
             </ul>
           </div>
@@ -58,11 +59,11 @@
                 <div class="card-body">
                     <!--<p class="card-text">This page is for students.</p>-->
                     <!--<p>サークル：{{society.society_name}}</p>-->
-                    <p><a href="{%url  'app:detail_society' user.pk society.email %}">{{society.society_name}}</a></p>
+                    <p><a href="{%url  'app:detail_society' user.pk society.id %}">{{society.society_name}}</a></p>
                     <p>{{society.school_name}}</p>
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="btn-group">
-                        {% if society.created %}
+                        {% if society.connected %}
                         <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
                         {% else %}
                           <a href="{%url 'app:follow' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>

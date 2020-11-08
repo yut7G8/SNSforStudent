@@ -18,12 +18,13 @@
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
               {% elif user.is_society %}
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
-                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</a></li>
                 <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
                 {% endif %} 
@@ -59,33 +60,39 @@
 <main role="main">
 <h1 class="mt-5 pt-4 text-center">イベント一覧</h1>
 <div class="album py-5 bg-light">
-    <div class="container">
+  <div class="container">
     {% for event in event_list %} 
     <div class="row">
         <div class="col-md-4">
             <div class="card mb-4 shadow-sm">
                 <br>
                 <div class="card-body">
-                    <p>{{event.event_name}}</p>
+                    <p><a href="{%url 'app:everyevent' user.pk event.id %}">{{event.event_name}}</a></p>
                     <p>{{event.content}}</p>
+
                     {% if user.is_student %}
-                    <p><a href="{%url  'app:detail_society' user.pk event.society.email %}">{{event.society.society_name}}</a></p>
-                    <div class="d-flex justify-content-between align-items-center">
+                      <p>サークル: <a href="{%url  'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+                      <div class="d-flex justify-content-between align-items-center">
+                      {% if event.joined %}
                         <div class="btn-group">
-                            <a href="{%url 'app:join_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加</a>
+                          <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">申し込み済み</a>
                         </div>
-                    {% elif user.is_society %}
-                      {% for student in event.students.all%}
-                        <p>{{student.email}}</p>
-                      {% endfor %}
+                      {% endif %}
+                     </div> 
                     {% endif %}
-                  </div>
+
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
+  </div>
 
+  <div style="text-align: center;">
+    <div class="btn-group">
+      <a href="{%url 'app:create_event' user.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント作成</a>
     </div>
+  </div>
 </div>
 </main>
 {% endblock content %}

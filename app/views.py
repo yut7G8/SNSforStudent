@@ -264,6 +264,7 @@ def detailfunc(request, pk):
     return render(request, 'detail.html', {'object':object})
 
 
+@login_required
 # 各BoardModelを参照するため用のdetail関数を用意
 def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
@@ -346,10 +347,12 @@ def view_societies(request, pk):
         user_list = User.objects.filter(is_society=True)
         society_list = []
         for society in user_list:
+            # 各サークルアカウントのfollower(student)を取得
             connections = Connection.objects.filter(following=society)
             for connection in connections:
                 if (connection.follower==request.user):
-                    society.created=True
+                    # ログインしたstudentユーザがsocietyをフォローしたらフラグを立てる(保存はしない)
+                    society.connected=True
             society_list.append(society)
         #print(society_list[0][0].pk)
         return render(request, 'society_list.html', {'society_list':society_list})
@@ -360,9 +363,9 @@ def view_societies(request, pk):
 # Studentユーザに対する各Societyアカウントの詳細表示
 @login_required
 @student_required
-def detail_society(request, pk, **kwargs):
+def detail_society(request, pk, id):
     if request.user.pk == pk:
-        society = User.objects.get(email=kwargs['email'])
+        society = User.objects.get(id=id)
         #print(society_pk)
         #society = get_object_or_404(User, pk=society_pk)
         connections = Connection.objects.filter(following=society)
@@ -459,7 +462,7 @@ def follow_from_detail(request, *args, **kwargs):
     except User.DoesNotExist:
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
-        return redirect('app:detail_society' , pk=request.user.pk)
+        return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
 
     if follower == following:
         messages.warning(request, '自分自身はフォローできませんよ')
@@ -557,12 +560,19 @@ def view_events(request, pk):
             student = User.objects.get(pk=pk)
             # ログインしたStudentユーザと結ぶついているConnection
             connections = Connection.objects.filter(follower=student)
+
             # イベントリスト
             event_list = []
             for connection in connections:
                 # ログインしたStudentユーザがフォローしてるサークルの作成したイベントを取得
                 events = Event.objects.filter(society=connection.following)
                 for event in events:
+                    # 各イベントについて参加者を取得
+                    participants = event.students.all()
+                    for participant in participants:
+                        # 参加者の中にログインしたユーザがいれば(すでに参加申し込みしていれば)フラグを立てる
+                        if request.user == participant:
+                            event.joined = True
                     event_list.append(event)
 
             # Studentユーザに対して自身がフォローしてるサークルの作成したイベントを表示する。
@@ -574,11 +584,6 @@ def view_events(request, pk):
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
             event_list = Event.objects.filter(society=society)
-            print(event_list[0].students.all())
-            #student_list = []
-            #for event in event_list:
-                #student_list.append(event.students.all())
-            #print(student_list)
             # Societyユーザに対して自身が作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -606,4 +611,46 @@ def join_event(request, pk, id):
         return redirect('app:view_events', pk=request.user.pk)
     else:
         return redirect('app:logout')    
+
+
+
+@login_required
+# イベント告知の詳細ページへ
+def everyevent(request, pk, id):
+    # ユーザ認証(url書き換えによるログイン偽装防止)
+    if request.user.pk == pk:
+
+        event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
+        user = request.user
         
+        # Studentユーザに対する表示
+        if user.is_student:
+
+            # 各イベントについて参加者を取得
+            participants = event.students.all()
+            for participant in participants:
+                # 参加者の中にログインしたユーザがいれば(すでに参加申し込みしていれば)フラグを立てる
+                if user == participant:
+                    event.joined = True
+
+            return render(request, 'everyevent.html', {'event': event, 'user':user})
+
+        # Societyユーザに対する表示
+        elif user.is_society:
+            return render(request, 'everyevent.html', {'event': event, 'user':user})
+
+
+    else:
+        return redirect('app:logout') 
+        
+
+def join_event_confirm(request, pk, id):
+    # ユーザ認証(url書き換えによるログイン偽装防止)
+    if request.user.pk == pk:
+        # イベント情報取得
+        event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
+        user = request.user
+        return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
+
+    else:
+        return redirect('app:logout') 

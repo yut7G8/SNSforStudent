@@ -16,11 +16,13 @@
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
               {% elif user.is_society %}
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
-                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>  
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li> 
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント/a></li> 
                 <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
                 {% endif %} 
@@ -46,26 +48,58 @@
 {% block content %}   
 
 <div class="card text-secondary" style="margin-top: 55px;">
- {% if post.images %}
- <img style="width: 100%; max-height: 500;" class="img-fluid mx-auto" src="{{ post.images.url }}">
- {% else %}
- <div class="p-1 border border-secondary text-center pt-5" style="min-width: 500; min-height: 400;">No images</div>
- {% endif %}  <div class="card-body">
-   <h3 class="card-title font-weight-bold text-center">{{ post.title }}</h3>
+<div class="card-body">
+   <h3 class="card-title font-weight-bold text-center">{{ event.event_name }}</h3>
    <div class="p-3">
-   <p class="card-text">{{ post.content }}</p>
-   {% if user.is_student %}
-   <a href="{%url 'app:detail_society' user.pk post.user.id %}"><p>投稿者　{{post.author}}</p></a>
-   {% else %}
-   <p>投稿者　{{post.author}}</p>
-   {% endif %}
-   <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p>
-   <p>閲覧数　{{post.read}}</p>
-   <p>{{post.readtext}}</p>
-   {% if user.is_society %}
-    <a href="{% url 'app:edit' post_id=post.id %}"><button type="button" class="btn btn-outline-primary">編集</button></a>
-    <a href="{% url 'app:delete' post_id=post.id %}"><button type="button" class="btn btn-outline-danger">削除</button></a>
-   {% endif %}
+   <p class="card-text">{{ event.content }}</p>
+
+  {% if user.is_student %}
+      <p>サークル: </sa-kuru><a href="{%url 'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+      {% if event.joined %}
+        <p>あなたはすでにこのイベントに申し込み済です。</p>
+      {% else%}
+        <div class="btn-group">
+          <a href="{%url 'app:join_event_confirm' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加フォームへ</a>
+        </div>
+      {% endif%}
+
+  {% elif user.is_society %}
+  <br>
+
+   <h5 style="text-align:center">参加者名簿</h5>
+   <br>
+   <div style="text-align: center;">
+
+    <style type="text/css">
+    table {
+      border-collapse: collapse;
+      color: #333; /* 全体の文字色 */
+      background-color: #f0f2f7; /* 全体の背景色 */
+      width: 100%;
+    }
+    th, td {
+      padding: 5px 15px;
+      border: solid 1px #adb3c1;
+    }</style>
+
+    <table>
+      <tr>
+        <th>姓</th>
+        <th>名</th>
+        <th>メールアドレス</th>
+      </tr>
+      {% for student in event.students.all%}
+      <tr>
+        <td>{{student.first_name}}</td>
+        <td>{{student.last_name}}</td>
+        <td>{{student.email}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+   </div>
+  {% endif %}
+
  </div>
 </div>
 </div>
