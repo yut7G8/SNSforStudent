@@ -4,12 +4,14 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, Student, Company, BoardModel, Event
+from .models import User, Student, Company, BoardModel, Event, Information
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
 from django.forms import ModelForm
+
+import bootstrap_datepicker_plus as datetimepicker
 
 #User = get_user_model()
 
@@ -130,13 +132,13 @@ class PostAddForm(forms.ModelForm):
 
 # サークルユーザ用イベント作成フォーム
 class CreateEventForm(forms.ModelForm):
+
     #event_date = forms.SplitDateTimeField(label='作成日')
+    extra_info = forms.CharField(required=False)
+
     class Meta:
         model = Event
-        fields = ['event_name', 'content', 'event_date']
-        #widgets = {
-            #'event_date': forms.SelectDateWidget
-        #}
+        fields = ['event_name', 'content', 'event_date', 'deadline', 'extra_info', ]
 
 
 # サークルユーザ用イベント編集フォーム
@@ -144,7 +146,11 @@ class EditEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields =['event_name', 'content', 'event_date']
+        fields = ['event_name', 'content', 'event_date', 'deadline', ]
+
+        #widgets = {
+            #'event_date': forms.SelectDateWidget
+        #}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

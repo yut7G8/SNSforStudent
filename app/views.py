@@ -18,7 +18,7 @@ from .forms import (
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
 
-from .models import User, Student, Company, BoardModel, Connection, Event
+from .models import User, Student, Company, BoardModel, Connection, Event, Information
 from .decorators import student_required, society_required, company_required
 
 from django.contrib.auth.forms import UserCreationForm
@@ -30,6 +30,11 @@ from .helpers import get_current_user
 from django.contrib import messages
 
 from django.utils.decorators import method_decorator
+
+from datetime import datetime
+from pytz import timezone, utc
+from tzlocal import get_localzone
+import pytz
 
 # ログイン前のページ表示
 def selectfunc(request):
@@ -561,6 +566,9 @@ def view_events(request, pk):
             # ログインしたStudentユーザと結ぶついているConnection
             connections = Connection.objects.filter(follower=student)
 
+            # 日本時間
+            jst = pytz.timezone('Asia/Tokyo')
+
             # イベントリスト
             event_list = []
             for connection in connections:
@@ -569,11 +577,17 @@ def view_events(request, pk):
                 for event in events:
                     # 各イベントについて参加者を取得
                     participants = event.students.all()
-                    for participant in participants:
-                        # 参加者の中にログインしたユーザがいれば(すでに参加申し込みしていれば)フラグを立てる
-                        if request.user == participant:
-                            event.joined = True
-                    event_list.append(event)
+
+                    # イベント開催日が現在の時刻より先ならば
+                    if event.event_date > datetime.now(tz=jst):
+                        for participant in participants:
+                            # 参加者の中にログインしたユーザがいれば(すでに参加申し込みしていれば)フラグを立てる
+                            if request.user == participant:
+                                event.joined = True
+                        # 申し込み期限が過ぎていたらフラグを立てる
+                        if event.deadline < datetime.now(tz=jst):
+                            event.expired = True
+                        event_list.append(event)
 
             # Studentユーザに対して自身がフォローしてるサークルの作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
@@ -600,6 +614,9 @@ def everyevent(request, pk, id):
 
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
+
+        # 日本時間
+        jst = pytz.timezone('Asia/Tokyo')
         
         # Studentユーザに対する表示
         if user.is_student:
@@ -610,6 +627,10 @@ def everyevent(request, pk, id):
                 # 参加者の中にログインしたユーザがいれば(すでに参加申し込みしていれば)フラグを立てる
                 if user == participant:
                     event.joined = True
+
+            # 申し込み期限が過ぎていたらフラグを立てる
+            if event.deadline < datetime.now(tz=jst):
+                event.expired = True
 
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
@@ -626,6 +647,7 @@ def join_event_confirm(request, pk, id):
     if request.user.pk == pk:
         # イベント情報取得
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
+        print(event.extra_info.info)
         user = request.user
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 

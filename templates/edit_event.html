@@ -51,7 +51,11 @@
             {% endfor %}
         </tbody>
     </table>
-    {% csrf_token %}
+
+    <div style="text-align: center;">
     <button type="submit" class="btn btn-success btn-lg" >送信</button>
+  </div>
+
+  {% csrf_token %}
 </form>
 {% endblock %}

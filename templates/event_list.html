@@ -69,7 +69,9 @@
                 <div class="card-body">
                     <p><a href="{%url 'app:everyevent' user.pk event.id %}">{{event.event_name}}</a></p>
                     <p>{{event.content}}</p>
-                    <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}}</p>
+                    <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}} ~ </p>
+                    <p class="card-text">申し込み締め切り: {{ event.deadline |date:"y/n/j, H:i"}} まで </p>
+
 
                     {% if user.is_student %}
                       <p>サークル: <a href="{%url  'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
@@ -77,6 +79,10 @@
                       {% if event.joined %}
                         <div class="btn-group">
                           <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">申し込み済み</a>
+                        </div>
+                      {% elif event.expired %}
+                        <div class="btn-group">
+                          <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">申し込み期限切れ</a>
                         </div>
                       {% endif %}
                      </div> 
@@ -89,11 +95,13 @@
     {% endfor %}
   </div>
 
+  {% if user.is_society %}
   <div style="text-align: center;">
     <div class="btn-group">
       <a href="{%url 'app:create_event' user.pk %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント作成</a>
     </div>
   </div>
+  {% endif %}
 </div>
 </main>
 {% endblock content %}
