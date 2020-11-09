@@ -63,6 +63,8 @@
             <a href="{%url 'app:cancel_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加キャンセル</a>
           </div>
         </div>
+      {% elif event.expired %}
+        <p>このイベントの申し込み期限は過ぎています。</p>
       {% else%}
       <div style="text-align: center;">
         <div class="btn-group">

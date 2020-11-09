@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_cleanup',
     'bootstrap4',
     'widget_tweaks',
+    'bootstrap_datepicker_plus',
 ]
 
 MIDDLEWARE = [

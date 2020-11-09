@@ -157,6 +157,7 @@ class Connection(models.Model):
         return "{} : {}".format(self.follower.username, self.following.username)
 
 
+
 # イベントクラス
 class Event(models.Model):
     # 主催者(society)
@@ -176,3 +177,13 @@ class Event(models.Model):
 
     def __str__(self):
         return self.event_name
+
+
+# イベント参加時に学生ユーザに打ち込んでもらう追加情報
+class Information(models.Model):
+    # 情報主(学生)
+    info_owner = models.ForeignKey(User, related_name='info_owner', on_delete=models.CASCADE)
+    # 結びついているイベント
+    event = models.ForeignKey(Event, related_name='event', on_delete=models.CASCADE)
+    # 追加情報
+    info = models.CharField(max_length=200)

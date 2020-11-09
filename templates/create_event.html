@@ -50,12 +50,25 @@
  <label for="id_content" class="sr-only">本文</label>
  <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
  
+ <p>開催日時</p>
  <div style="text-align: center;">
  <label for="id_event_date" class="sr-only">開催日時</label>
  <input type="datetime-local" name="event_date" placeholder="開催日時" required id="id_event_date">
  </div>
  <br>
+ 
+ <p>申し込み締め切り</p>
+ <div style="text-align: center;">
+ <label for="id_deadline" class="sr-only">申し込み締め切り</label>
+ <input type="datetime-local" name="deadline" placeholder="開催日時" required id="id_deadline">
+ </div>
+ <br>
 
+ <label for="id_extra_info" class="sr-only">その他入力して欲しい情報</label>
+ <textarea type="text" name="extra_info" placeholder="追加情報" cols="30" rows="1" class="form-control mb-3"></textarea>
+
+ <div style="text-align: center;">
  <button type="submit" class="btn btn-block btn-outline-success">作成する</button>
+</div>
 </form>
 {% endblock %}
