@@ -29,8 +29,11 @@ urlpatterns = [
     path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
 
     #path('detail/<int:pk>', detailfunc, name='detail'),
-    path('good/<int:pk>', goodfunc, name='good'),
+    path('good/<int:pk>/', goodfunc, name='good'),
 
+    # いいね機能用のpath
+    path('like/', views.like, name='like'),
+    
     path('student_profile/<int:pk>', student_profile, name='student_profile'),
     path('student_profile_update/<int:pk>',views.StudentProfileUpdate.as_view(),name='student_profile_update'),
     #path('<slug:username>', views.StudentProfileDetailView.as_view(), name='profile'),

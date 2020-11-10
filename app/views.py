@@ -274,10 +274,22 @@ def detailfunc(request, pk):
 def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
     user = request.user
-    #print(request.user.is_society)
-    #print(post.author)
-    return render(request, 'everypost.html', {'post': post, 'user':user})
+    # 以降を追加：いいね機能用
+    liked = False
+    if post.like.filter(id=request.user.id).exists():
+        liked = True
+    return render(request, 'everypost.html', {'post': post, 'user':user, 'liked': liked})
 
+def like(request):
+   post = get_object_or_404(BoardModel, id=request.POST.get('post_id'))
+   liked = False
+   if post.like.filter(id=request.user.id).exists():
+       post.like.remove(request.user)
+       liked = False
+   else:    
+       post.like.add(request.user)
+       liked = True
+   return redirect('app:everypost', post_id=post.id)
 
 @login_required
 @society_required
@@ -717,5 +729,3 @@ def delete_event(request, pk, id):
 
     else:
         return redirect('app:logout')
-
-

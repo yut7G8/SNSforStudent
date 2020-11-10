@@ -59,7 +59,11 @@
    {% else %}
    <p>投稿者　{{post.author}}</p>
    {% endif %}
-   <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p>
+   {% if user.is_student %}
+   <div id="like">
+    {% include 'blog_app/like.html' %}
+   </div>
+   {% endif %}
    <p>閲覧数　{{post.read}}</p>
    <p>{{post.readtext}}</p>
    {% if user.is_society %}
