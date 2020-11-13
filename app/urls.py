@@ -38,6 +38,9 @@ urlpatterns = [
     #path('<slug:username>/edit', views.StudentProfileUpdateView.as_view(), name='edit'),
     #path('student_profile/<int:pk>', views.StudentProfile.as_view(), name='student_profile'),
 
+    path('society_profile/<int:pk>/', views.SocietyProfile.as_view(), name='society_profile'),
+    path('society_profile_update/<int:pk>/', views.SocietyProfileUpdate.as_view(), name='society_profile_update'),
+
     path('follow/<email>', views.follow_view, name='follow'),
     path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),

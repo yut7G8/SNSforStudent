@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
-    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, StudentProfileUpdateForm
+    LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, StudentProfileUpdateForm, SocietyProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -399,6 +399,7 @@ def student_profile(request, pk):
         return redirect('app:logout')
 
 
+#studentのプロフィールのアップデート
 class StudentProfileUpdate(OnlyYouMixin, generic.UpdateView):
     model = User
     form_class = StudentProfileUpdateForm
@@ -407,7 +408,19 @@ class StudentProfileUpdate(OnlyYouMixin, generic.UpdateView):
     def get_success_url(self):
         return resolve_url('app:student_profile', pk=self.kwargs['pk'])
 
+#サークルのプロフィール表示
+class SocietyProfile(OnlyYouMixin, generic.DetailView):
+    model = User
+    template_name = 'society_profile.html'
 
+#サークルのプロフィールのアップデート
+class SocietyProfileUpdate(OnlyYouMixin, generic.UpdateView):
+    model = User
+    form_class = SocietyProfileUpdateForm
+    template_name = 'society_profile_update.html'
+
+    def get_success_url(self):
+        return resolve_url('app:society_profile', pk=self.kwargs['pk'])
 
 # フォロー
 @login_required

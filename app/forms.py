@@ -119,6 +119,18 @@ class StudentProfileUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
+
+class SocietyProfileUpdateForm(forms.ModelForm):
+    """societyのプロフィール更新用のフォーム定義"""
+    class Meta:
+        model = User
+        fields =['society_name', 'school_name', 'about_me'] 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
     
 # 投稿用のフォームを作成
 class PostAddForm(forms.ModelForm):
