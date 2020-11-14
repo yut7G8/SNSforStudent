@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 {% load static %}
 
 {% block customcss %}
@@ -41,10 +42,10 @@
 <form method="POST" enctype="multipart/form-data">
  {% csrf_token %}
  <label for="id_title" class="sr-only">タイトル</label>
- <input type="text" name="title" placeholder="タイトル" maxlength="50" class="form-control mb-3" required id="id_title">
+ {{ form.title|add_class:"form-control mb-3"}}
 
  <label for="id_content" class="sr-only">本文</label>
- <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
+ {{ form.content|add_class:"form-control mb-3"}}
  
  <div class="mb-3 form-control text-secondary">
     <label>画像</label>
