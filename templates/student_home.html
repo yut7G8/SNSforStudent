@@ -61,22 +61,24 @@
     <div class="d-flex justify-content-center flex-wrap">
     {% for post in object_list %}
     
-    <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
+    <div class="card m-4" style="min-width: 300; max-height: 490;">
       {% if post.images %}
-        <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+        <img style="width: 300px; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+        <hr>
       {% else %}
         <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
       {% endif %}
       <a href="{% url 'app:everypost' post_id=post.id %}">
-      <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
+      <h4 class="card-title" style="text-align:center;">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
       </a>
       <p class="card-text">
       　{{ post.content|truncatechars:17 }}
       </p>
-      <p>投稿者　{{post.author}}</p>
+      <p>　投稿者　{{post.author}}</p>
       <!-- <p>{{post.good}}</p>
       <p>{{post.read}}</p> -->
       <p>{{post.readtext}}</p>
+    </div>
       
     {% endfor %}
   </div>
