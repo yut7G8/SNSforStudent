@@ -647,7 +647,6 @@ def join_event_confirm(request, pk, id):
     if request.user.pk == pk:
         # イベント情報取得
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
-        print(event.extra_info.info)
         user = request.user
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 
