@@ -335,11 +335,11 @@ def delete(request, post_id):
 
 
 # いいね機能の実装
-def goodfunc(request, pk):
-    post = BoardModel.objects.get(pk=pk)
+def goodfunc(request, post_id):
+    post = get_object_or_404(BoardModel, id=post_id)
     post.good = post.good + 1
     post.save()
-    return redirect('app:student_home')
+    return render(request,'everypost.html',{'post':post})
 
 
 # Studentユーザに対するSocietyアカウントの一覧表示

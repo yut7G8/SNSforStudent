@@ -29,7 +29,7 @@ urlpatterns = [
     path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
 
     #path('detail/<int:pk>', detailfunc, name='detail'),
-    path('good/<int:pk>', goodfunc, name='good'),
+    path('detail/<int:post_id>/', goodfunc, name='good'),
 
     path('student_profile/<int:pk>', student_profile, name='student_profile'),
     path('student_profile_update/<int:pk>',views.StudentProfileUpdate.as_view(),name='student_profile_update'),
