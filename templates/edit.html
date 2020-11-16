@@ -42,6 +42,7 @@
 <h1 class="mt-5 pt-4 text-center">編集</h1>
 <form method="POST" enctype="multipart/form-data">
  {% csrf_token %}
+ 
  <label for="id_title" class="sr-only">タイトル</label>
  {{ form.title|add_class:"form-control mb-3"}}
 

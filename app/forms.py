@@ -146,14 +146,15 @@ class PostAddForm(forms.ModelForm):
 class CreateEventForm(forms.ModelForm):
 
     #event_date = forms.SplitDateTimeField(label='作成日')
-    extra_info = forms.CharField(required=False)
+    #extra_info = forms.CharField(required=False)
 
     class Meta:
         model = Event
-        fields = ['event_name', 'content', 'event_date', 'deadline', 'extra_info', ]
+        fields = ['event_name', 'content', 'event_date', 'deadline',]
 
 
 # サークルユーザ用イベント編集フォーム
+# 使わないかも
 class EditEventForm(forms.ModelForm):
 
     class Meta:

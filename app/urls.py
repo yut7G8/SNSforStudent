@@ -60,7 +60,8 @@ urlpatterns = [
     path('join_event_confirm/<int:pk>/<int:id>/', views.join_event_confirm, name='join_event_confirm'), # イベントの参加フォーム(確認画面へ)
     path('join_event/<int:pk>/<int:id>/', views.join_event, name='join_event'), # 学生ユーザによるイベント参加
     path('cancel_event/<int:pk>/<int:id>/', views.cancel_event, name='cancel_event'), #学生ユーザによるイベント参加キャンセル
-    path('edit_event/<int:pk>',views.EditEvent.as_view(),name='edit_event'), #サークルユーザによるイベント編集
+    #path('edit_event/<int:pk>',views.EditEvent.as_view(),name='edit_event'), #サークルユーザによるイベント編集
+    path('edit_event/<int:pk>/<int:id>/',views.edit_event,name='edit_event'),
     path('delete_event/<int:pk>/<int:id>/', views.delete_event, name='delete_event'), # サークルユーザによるイベント削除
 
     

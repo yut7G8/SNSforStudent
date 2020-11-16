@@ -709,13 +709,31 @@ def cancel_event(request, pk, id):
 
 
 # Societyユーザによるイベントの編集
-class EditEvent(OnlyYouMixin, generic.UpdateView):
+# このやり方だと途中から403forbitten
+'''class EditEvent(OnlyYouMixin, generic.UpdateView):
     model = Event
     form_class = EditEventForm
     template_name = 'edit_event.html'
 
     def get_success_url(self):
-        return resolve_url('app:view_events', pk=self.kwargs['pk'])
+        return resolve_url('app:view_events', pk=self.kwargs['pk'])'''
+
+# クラスじゃなくて関数の使用で逃げる
+@login_required
+@society_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit_event(request, pk, id):
+    event = get_object_or_404(Event, id=id)
+    if(event.society.username==request.user.username):
+        if request.method == "POST":
+            form = CreateEventForm(request.POST, request.FILES, instance=event)
+            if form.is_valid():
+                form.save()
+                return redirect('app:everyevent', pk=pk, id=id)
+        else:
+            form = CreateEventForm(instance=event)
+        return render(request, 'edit_event.html', {'form': form, 'event':event })
+    return redirect('app:logout')
 
 
 # Societyユーザによるイベントの削除
