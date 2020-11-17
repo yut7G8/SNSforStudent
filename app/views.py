@@ -13,12 +13,13 @@ from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
-    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm
+    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm,
+    AddInformationForm, InputInformationForm,
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
 
-from .models import User, Student, Company, BoardModel, Connection, Event, Information
+from .models import User, Student, Company, BoardModel, Connection, Event, Information, ExtraInfo
 from .decorators import student_required, society_required, company_required
 
 from django.contrib.auth.forms import UserCreationForm
@@ -35,6 +36,8 @@ from datetime import datetime
 from pytz import timezone, utc
 from tzlocal import get_localzone
 import pytz
+
+from extra_views import CreateWithInlinesView, InlineFormSet
 
 # ログイン前のページ表示
 def selectfunc(request):
@@ -546,23 +549,28 @@ def unfollow_view(request, *args, **kwargs):
 
 @login_required
 @society_required
-# Societyユーザによるイベント作成
 def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
     if request.user.pk == pk:
         if request.method == "POST":
             form = CreateEventForm(request.POST, request.FILES)
+            form_info = AddInformationForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save(commit=False)
                 # イベントの主催者にログインユーザ(サークル)を登録
                 event.society = request.user
                 event.save()
-                return redirect('app:view_events', pk=request.user.pk)
+                info = form_info.save(commit=False)
+                info.event = event
+                info.save()
+            return redirect('app:view_events', pk=request.user.pk)
         else:   
             form = CreateEventForm()
-        return render(request, 'create_event.html', {'form': form})
+            form_info = AddInformationForm()
+        return render(request, 'create_event.html', {'form': form, 'form_info':form_info})
     else:
         return redirect('app:logout')
+
 
 
 @login_required
@@ -627,6 +635,10 @@ def everyevent(request, pk, id):
 
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
+        information = get_object_or_404(Information, event=event)
+        #extrainfos = ExtraInfo.objects.filter(source=information)
+        #extrainfos = get_object_or_404(ExtraInfo, source=information)
+        #print(information)
 
         # 日本時間
         jst = pytz.timezone('Asia/Tokyo')
@@ -649,11 +661,15 @@ def everyevent(request, pk, id):
 
         # Societyユーザに対する表示
         elif user.is_society:
+            #if information.info_title != '':
+                #user.info = 
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
     return redirect('app:logout') 
         
 
+@login_required
+@student_required
 # Studentユーザへのイベント参加確認画面の表示
 def join_event_confirm(request, pk, id):
     # ユーザ認証(url書き換えによるログイン偽装防止)
@@ -661,6 +677,25 @@ def join_event_confirm(request, pk, id):
         # イベント情報取得
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
+
+        # 追加情報モデル取得
+        information = get_object_or_404(Information, event=event)
+
+        # 追加で入力すべき情報がある場合
+        if information.info_title != '':
+            event.flag = True
+            if request.method == "POST":
+                form = InputInformationForm(request.POST, request.FILES)
+                if form.is_valid():
+                    info = form.save(commit=False)
+                    info.source = information
+                    info.info_owner = request.user
+                    info.save()
+
+                return redirect('app:join_events', pk=request.user.pk, id=id)
+            else:
+                form = InputInformationForm()
+            return render(request, 'join_event_confirm.html', {'event': event, 'user':user, 'information':information, 'form':form})
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 
     else:
@@ -682,7 +717,8 @@ def join_event(request, pk, id):
         # 変更内容保存
         event.save()
         # 確認
-        print(event.students.all())
+        #print(event.students.all())
+
         return redirect('app:view_events', pk=request.user.pk)
     else:
         return redirect('app:logout') 
@@ -724,15 +760,19 @@ def cancel_event(request, pk, id):
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit_event(request, pk, id):
     event = get_object_or_404(Event, id=id)
+    information = get_object_or_404(Information, event=event)
     if(event.society.username==request.user.username):
         if request.method == "POST":
             form = CreateEventForm(request.POST, request.FILES, instance=event)
+            form_info = AddInformationForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
+                #form_info.save()
                 return redirect('app:everyevent', pk=pk, id=id)
         else:
             form = CreateEventForm(instance=event)
-        return render(request, 'edit_event.html', {'form': form, 'event':event })
+            form_info = AddInformationForm(instance=information)
+        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
     return redirect('app:logout')
 
 

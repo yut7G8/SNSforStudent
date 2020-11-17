@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.utils.translation import ugettext_lazy as _
-from .models import User, Student, Company, BoardModel, Connection, Event, Information
+from .models import User, Student, Company, BoardModel, Connection, Event, Information, ExtraInfo
 
 
 class MyUserChangeForm(UserChangeForm):
@@ -65,3 +65,4 @@ admin.site.register(BoardModel)
 admin.site.register(Connection)
 admin.site.register(Event)
 admin.site.register(Information)
+admin.site.register(ExtraInfo)

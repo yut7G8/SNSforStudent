@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
 {% load static %}
 
 {% block customcss %}
@@ -27,7 +26,7 @@
     </div>
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
-        <a href="#" class="navbar-brand d-flex align-items-center">
+        <a href="#" class="navbar-brand d-flex align-posts-center">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
           <strong>学生向けSNS</strong>
         </a>
@@ -37,42 +36,24 @@
       </div>
     </div>
   </header>
+
 {% endblock header %}
 
 {% block content %}
-<h1 class="mt-5 pt-4 text-center">イベント編集</h1>
-<form method="POST" enctype="multipart/form-data">
- {% csrf_token %}
+<h1 class="mt-5 pt-4 text-center">イベント作成</h1>
+<form method="post">
+  {% csrf_token %}
+  <table>
+      {{ form.as_table }}
+  </table>
 
- <label for="id_title" class="sr-only">イベント名</label>
- {{ form.event_name|add_class:"form-control mb-3"}}
-
- <label for="id_content" class="sr-only">本文</label>
- {{ form.content|add_class:"form-control mb-3"}}
- 
- <p>開催日時</p>
- <div style="text-align: center;">
- <label for="id_event_date" class="sr-only">開催日時</label>
-{{ form.event_date }}
- </div>
- <br>
- 
- <p>申し込み締め切り</p>
- <div style="text-align: center;">
- <label for="id_deadline" class="sr-only">申し込み締め切り</label>
- {{ form.deadline }}
- </div>
- <br>
-
- <p>追加で入力して欲しい情報</p>
- <div style="text-align: center;">
- <label for="id_info" class="sr-only">追加情報</label>
-  {{form_info.info_title}}
- </div>
- <br>
-
- <div style="text-align: center;">
- <button type="submit" class="btn btn-block btn-outline-success">編集する</button>
-</div>
+　　　　　　　　　　　　　　　 {# インラインはinlinesという変数にリストで入っている #}
+  <p>追加情報</p>
+  <table>
+      {% for form in inlines %}
+          {{ form.as_table }}
+      {% endfor %}
+  </table>
+  <button type="submit">save</button>
 </form>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, Student, Company, BoardModel, Event, Information
+from .models import User, Student, Company, BoardModel, Event, Information, ExtraInfo
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -151,6 +151,25 @@ class CreateEventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['event_name', 'content', 'event_date', 'deadline',]
+
+
+# サークルが作成する追加情報欄
+class AddInformationForm(forms.ModelForm):
+
+    info_title = forms.CharField(required=False)
+
+    class Meta:
+        model = Information
+        fields = ['info_title',]
+
+
+# 学生が入力する追加情報
+class InputInformationForm(forms.ModelForm):
+
+    class Meta:
+        model = ExtraInfo
+        fields = ['info', ]
+
 
 
 # サークルユーザ用イベント編集フォーム

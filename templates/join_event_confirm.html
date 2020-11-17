@@ -48,8 +48,15 @@
 
 <div class="card text-secondary" style="margin-top: 55px;">
 <div class="card-body">
-   <h3 class="card-title font-weight-bold text-center">確認画面</h3>
+   <h3 class="card-title font-weight-bold text-center">入力・確認画面</h3>
    <div class="p-3">
+   <div style="text-align: center;">
+
+   {% if event.flag %}
+    {{information.info_title}}
+    {{form.info}}
+   {% endif %}
+   
    <p class="card-text">あなたは
        {{event.society.society_name}}
        が主催する
@@ -60,6 +67,7 @@
    </p>
    <div class="btn-group">
     <a href="{%url 'app:join_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加</a>
+   </div>
    </div>
  </div>
 </div>
