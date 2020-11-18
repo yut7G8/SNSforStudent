@@ -553,7 +553,9 @@ def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
     if request.user.pk == pk:
         if request.method == "POST":
+            # イベント作成フォーム
             form = CreateEventForm(request.POST, request.FILES)
+            # 追加情報入力フォーム(サークル)
             form_info = AddInformationForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save(commit=False)
@@ -561,9 +563,10 @@ def create_event(request, pk):
                 event.society = request.user
                 event.save()
                 info = form_info.save(commit=False)
+                # 追加情報とイベントを紐付け
                 info.event = event
                 info.save()
-            return redirect('app:view_events', pk=request.user.pk)
+                return redirect('app:view_events', pk=request.user.pk)
         else:   
             form = CreateEventForm()
             form_info = AddInformationForm()
@@ -636,9 +639,6 @@ def everyevent(request, pk, id):
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
         information = get_object_or_404(Information, event=event)
-        #extrainfos = ExtraInfo.objects.filter(source=information)
-        #extrainfos = get_object_or_404(ExtraInfo, source=information)
-        #print(information)
 
         # 日本時間
         jst = pytz.timezone('Asia/Tokyo')
@@ -661,13 +661,33 @@ def everyevent(request, pk, id):
 
         # Societyユーザに対する表示
         elif user.is_society:
-            #if information.info_title != '':
-                #user.info = 
+
+            # 追加入力がある場合
+            if information.info_title != '':
+                # html表示のためにフラグを立てておく
+                event.flag = True
+                # 追加情報のタイトルをhtmlに渡す用
+                event.extra = information.info_title
+                # 学生に入力してもらった追加情報を取得
+                extrainfos = ExtraInfo.objects.filter(source=information)
+                # イベント参加者情報を取得
+                students = event.students.all()
+                for student in students:
+                    for extrainfo in extrainfos:
+                        if student == extrainfo.info_owner:
+                            # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
+                            student.info = extrainfo.info
+                return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
+            
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
     return redirect('app:logout') 
         
 
+
+# 流れ
+# 追加情報あり: join_event_comfirm → join_event_comfirm.html → join_event_comfirm(追加情報の保存) → join_event(参加者登録)
+# 追加情報なし: join_event_comfirm → join_event_comfirm.html → join_event(参加者登録)
 @login_required
 @student_required
 # Studentユーザへのイベント参加確認画面の表示
@@ -683,19 +703,25 @@ def join_event_confirm(request, pk, id):
 
         # 追加で入力すべき情報がある場合
         if information.info_title != '':
+            # html表示のためにフラグを立てる
             event.flag = True
             if request.method == "POST":
+                # 追加情報入力フォーム取得
                 form = InputInformationForm(request.POST, request.FILES)
                 if form.is_valid():
                     info = form.save(commit=False)
+                    # 追加情報のタイトル情報(サークルが決めたものとの紐付け)
                     info.source = information
+                    # 入力した学生ユーザとの紐付け
                     info.info_owner = request.user
+                    # 保存
                     info.save()
-
-                return redirect('app:join_events', pk=request.user.pk, id=id)
+                    return redirect('app:join_event', pk=user.pk, id=id)
             else:
+                # 追加情報入力フォーム取得
                 form = InputInformationForm()
             return render(request, 'join_event_confirm.html', {'event': event, 'user':user, 'information':information, 'form':form})
+
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 
     else:
@@ -732,10 +758,18 @@ def cancel_event(request, pk, id):
         # 該当イベント取得
         event = get_object_or_404(Event, id=id)
         students = event.students.all()
+        information = get_object_or_404(Information, event=event)
+
         # イベント参加者からログインユーザを探し削除
         for student in students:
             if student == request.user:
                 event.students.remove(student)
+
+        if information.info_title != '':
+            extrainfos = ExtraInfo.objects.filter(source=information)
+            for info in extrainfos:
+                if info.info_owner == request.user:
+                    info.delete()
 
         #return redirect('app:everyevent', pk=request.user.pk, id=id)
         return redirect('app:view_events', pk=request.user.pk)

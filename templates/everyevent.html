@@ -92,6 +92,25 @@
       border: solid 1px #adb3c1;
     }</style>
 
+    {% if event.flag %}
+    <table>
+      <tr>
+        <th>姓</th>
+        <th>名</th>
+        <th>メールアドレス</th>
+        <th>{{event.extra}}</th>
+      </tr>
+      {% for student in students %}
+      <tr>
+        <td>{{student.first_name}}</td>
+        <td>{{student.last_name}}</td>
+        <td>{{student.email}}</td>
+        <td>{{student.info}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {% else %}
     <table>
       <tr>
         <th>姓</th>
@@ -106,6 +125,7 @@
       </tr>
       {% endfor %}
     </table>
+    {% endif %}
 
    </div>
   </div>
