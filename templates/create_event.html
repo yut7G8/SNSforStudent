@@ -47,6 +47,11 @@
  <label for="id_title" class="sr-only">イベント名</label>
  <input type="text" name="event_name" placeholder="イベント名" maxlength="50" class="form-control mb-3" required id="id_event_name">
 
+ <div class="mb-3 form-control text-secondary">
+  <label>画像</label>
+      {{ form.images }}
+</div>
+
  <label for="id_content" class="sr-only">本文</label>
  <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
  

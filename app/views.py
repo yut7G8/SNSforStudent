@@ -371,13 +371,17 @@ def view_societies(request, pk):
 def detail_society(request, pk, id):
     if request.user.pk == pk:
         society = User.objects.get(id=id)
+        #サークルの投稿取得
+        posts = BoardModel.objects.filter(user=society)
+        #イベントの投稿取得
+        events = Event.objects.filter(society=society)
         #print(society_pk)
         #society = get_object_or_404(User, pk=society_pk)
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
                 society.created=True
-        return render(request, 'detail_society.html', {'society':society})
+        return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
     else:
         return redirect('app:logout')
 
