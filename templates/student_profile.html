@@ -48,6 +48,9 @@
 {% endblock header %}
 
 {% block content %}
+{% if student.image %}
+<img style="width:200px; height: 200px; object-fit:cover; border-radius:50%; ;" class="card-img-top" src="{{ student.image.url }}"> 
+{% endif %}
 <table class="table">
     <tbody>
         <tr>

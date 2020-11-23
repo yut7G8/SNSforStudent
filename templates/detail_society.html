@@ -15,6 +15,7 @@
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
                 <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
                 <li><a href="{%url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
             </ul>
           </div>
@@ -37,7 +38,7 @@
 
 {% block content %}
 <br>
-<div class='container'>
+<div class="container">
  
   <div class="alert alert-success" role="alert">
     <p>サークル名：{{society.society_name}}</p>
@@ -58,5 +59,81 @@
   </div>
  
  
+</div>
+
+<div class="p-3">
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="#posts" class="nav-link" data-toggle="tab">投稿</a>
+    </li>
+    <li class="nav-item">
+      <a href="#events" class="nav-link" data-toggle="tab">イベント</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="posts" class="tab-pane active">
+      <h1 class="mt-5 pt-4 text-center">投稿一覧</h1>
+        <div class="card-deck">
+          <div class="row row-cols-1 row-cols-md-3">
+            {% for post in posts %}
+            <div class="col mb-4">
+              <div class="card m-4 " style=" max-height: 490;">
+                {% if post.images %}
+                  <img style="max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+                  <hr>
+                {% else %}
+                  <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
+                {% endif %}
+                <a href="{% url 'app:everypost' post_id=post.id %}">
+                <h4 class="card-title" style="text-align:center;">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
+                </a>
+                <p class="card-text">
+                　{{ post.content|truncatechars:17 }}
+                </p>
+                <p class="card-text">　投稿者　{{post.author}}</p>
+                <!-- <p>{{post.good}}</p>
+                <p>{{post.read}}</p> -->
+                <p class="card-text">{{post.readtext}}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+    </div>
+    <div id="events" class="tab-pane">
+      <h1 class="mt-5 pt-4 text-center">イベント一覧</h1>
+        <div class="card-deck">
+          <div class="row row-cols-1 row-cols-md-3">
+            {% for event in events %}
+            <div class="col mb-4">
+              <div class="card m-4" style="max-height: 490;">
+                {% if event.images %}
+                  <img style="max-height: 300;" class="card-img-top" src="{{ event.images.url }}"> 
+                  <hr>
+                {% else %}
+                  <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
+                {% endif %}
+    
+                <a href="{%url 'app:everyevent' user.pk event.id %}">
+                <h4 class="card-title" style="text-align:center;">{{event.event_name|truncatechars:10 | linebreaksbr}}</h4>
+                </a>
+    
+                <p class="card-text">
+                　{{ event.content|truncatechars:17 }}
+                </p>
+                <p class="card-text">　投稿者　{{event.society}}</p>
+                <!-- <p>{{post.good}}</p>
+                <p>{{post.read}}</p> -->
+                <p class="card-text">{{event.event_date}}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+    </div>
+  </div>
+
 </div>
 {% endblock content %}

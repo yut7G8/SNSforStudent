@@ -115,7 +115,7 @@ class StudentProfileUpdateForm(forms.ModelForm):
     """studentのプロフィール更新用のフォーム定義"""
     class Meta:
         model = User
-        fields =['first_name', 'last_name', 'about_me', 'school_name', 'grade'] 
+        fields =['image','first_name', 'last_name', 'about_me', 'school_name', 'grade'] 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -127,7 +127,7 @@ class SocietyProfileUpdateForm(forms.ModelForm):
     """societyのプロフィール更新用のフォーム定義"""
     class Meta:
         model = User
-        fields =['society_name', 'school_name', 'about_me'] 
+        fields =['image','society_name', 'school_name', 'about_me'] 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -150,7 +150,7 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ['event_name', 'content', 'event_date', 'deadline',]
+        fields = ['event_name', 'content', 'event_date', 'deadline','images']
 
 
 # サークルが作成する追加情報欄

@@ -52,6 +52,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     society_name = models.CharField(_('society name'), max_length=150, blank=True)
     about_me = models.TextField(blank=True)
+    image = models.ImageField(upload_to='',blank=True,null=True)
 
     followers_number = models.IntegerField(_('followers_number'),null=True,blank=True,default=0)
     following_number = models.IntegerField(_('following_number'),null=True,blank=True,default=0)
@@ -170,7 +171,7 @@ class Event(models.Model):
     # イベント内容
     content = models.TextField()
     # 宣伝用画像
-    images = models.ImageField(upload_to='')
+    images = models.ImageField(upload_to='',blank=True,null=True)
     # イベント開催日
     event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
     # 申し込み締め切り日時
