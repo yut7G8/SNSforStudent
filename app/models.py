@@ -179,11 +179,26 @@ class Event(models.Model):
         return self.event_name
 
 
-# イベント参加時に学生ユーザに打ち込んでもらう追加情報
+# イベント参加時にサークルユーザが決定する追加情報
 class Information(models.Model):
-    # 情報主(学生)
-    info_owner = models.ForeignKey(User, related_name='info_owner', on_delete=models.CASCADE)
     # 結びついているイベント
     event = models.ForeignKey(Event, related_name='event', on_delete=models.CASCADE)
-    # 追加情報
-    info = models.CharField(max_length=200)
+    # 追加情報のタイトル(サークルが任意で決定)
+    info_title = models.CharField(max_length=200, default=None)
+
+    def __str__(self):
+        return self.info_title
+
+
+
+# イベント参加時に学生が入力する追加情報
+class ExtraInfo(models.Model):
+    source = models.ForeignKey(Information, related_name='source', on_delete=models.CASCADE)
+    # 情報主(学生)
+    info_owner = models.ForeignKey(User, related_name='info_owner', on_delete=models.CASCADE, default=None)
+    # 追加情報(学生が入力するもの)
+    info = models.CharField(max_length=200, default=None)
+
+    def __str__(self):
+        return self.info
+    

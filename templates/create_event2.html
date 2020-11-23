@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
 {% load static %}
 
 {% block customcss %}
@@ -17,6 +16,7 @@
                 <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
                 <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
                 <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</a></li>
                 <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
                 <li><a href="#" class="text-white">ユーザー情報</a></li>
             </ul>
@@ -36,44 +36,24 @@
       </div>
     </div>
   </header>
+
 {% endblock header %}
 
 {% block content %}
-<h1 class="mt-5 pt-4 text-center">編集</h1>
-<form method="POST" enctype="multipart/form-data">
- {% csrf_token %}
- 
- <label for="id_title" class="sr-only">タイトル</label>
- {{ form.title|add_class:"form-control mb-3"}}
+<h1 class="mt-5 pt-4 text-center">イベント作成</h1>
+<form method="post">
+  {% csrf_token %}
+  <table>
+      {{ form.as_table }}
+  </table>
 
- <label for="id_content" class="sr-only">本文</label>
- {{ form.content|add_class:"form-control mb-3"}}
- 
- <div class="mb-3 form-control text-secondary">
-    <label>画像</label>
-        {{ form.images }}
- </div>
- 
- <!--<label for="id_author" class="sr-only">author</label>
- <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
- 
- <div class="mb-3 form-control text-secondary">
-  <label>いいね(・∀・)ｲｲﾈ!!</label>
-      {{ form.good }}
- </div>
-
- <div class="mb-3 form-control text-secondary">
-  <label>閲覧数</label>
-      {{ form.read }}
- </div>
- 
- <div class="mb-3 form-control text-secondary">
-  <label>readtext</label>
-      {{ form.readtext }}
- </div>-->
- 
- <br>
- <br>
- <button type="submit" class="btn btn-block btn-outline-success">編集する</button>
+　　　　　　　　　　　　　　　 {# インラインはinlinesという変数にリストで入っている #}
+  <p>追加情報</p>
+  <table>
+      {% for form in inlines %}
+          {{ form.as_table }}
+      {% endfor %}
+  </table>
+  <button type="submit">save</button>
 </form>
 {% endblock %}

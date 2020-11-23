@@ -55,12 +55,14 @@ urlpatterns = [
     path('delete/<int:post_id>/', views.delete, name='delete'), # 削除機能の追加
 
     path('create_cvent/<int:pk>', views.create_event, name='create_event'), # サークルユーザによるイベント作成
+    #path('create_cvent/<int:pk>', views.CreateEventFormSet.as_view(), name='create_event'),
     path('view_events/<int:pk>', views.view_events, name='view_events'), # 学生ユーザに対するイベント表示
     path('everyevent/<int:pk>/<int:id>/', views.everyevent, name='everyevent'), # 各イベントの詳細表示
     path('join_event_confirm/<int:pk>/<int:id>/', views.join_event_confirm, name='join_event_confirm'), # イベントの参加フォーム(確認画面へ)
     path('join_event/<int:pk>/<int:id>/', views.join_event, name='join_event'), # 学生ユーザによるイベント参加
     path('cancel_event/<int:pk>/<int:id>/', views.cancel_event, name='cancel_event'), #学生ユーザによるイベント参加キャンセル
-    path('edit_event/<int:pk>',views.EditEvent.as_view(),name='edit_event'), #サークルユーザによるイベント編集
+    #path('edit_event/<int:pk>',views.EditEvent.as_view(),name='edit_event'), #サークルユーザによるイベント編集
+    path('edit_event/<int:pk>/<int:id>/',views.edit_event,name='edit_event'),
     path('delete_event/<int:pk>/<int:id>/', views.delete_event, name='delete_event'), # サークルユーザによるイベント削除
 
     
