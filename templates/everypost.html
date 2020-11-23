@@ -56,10 +56,11 @@
    <p class="card-text">{{ post.content }}</p>
    {% if user.is_student %}
    <a href="{%url 'app:detail_society' user.pk post.user.id %}"><p>投稿者　{{post.author}}</p></a>
+   <a href="{%url 'app:good' post_id=post.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">good：{{post.good}}</a>
    {% else %}
    <p>投稿者　{{post.author}}</p>
    {% endif %}
-   <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p>
+   <!-- <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p> -->
    <p>閲覧数　{{post.read}}</p>
    <p>{{post.readtext}}</p>
    {% if user.is_society %}

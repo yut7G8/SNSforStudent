@@ -39,6 +39,9 @@ import pytz
 
 from extra_views import CreateWithInlinesView, InlineFormSet
 
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
 # ログイン前のページ表示
 def selectfunc(request):
     return render(request,'select.html')
@@ -277,9 +280,10 @@ def detailfunc(request, pk):
 def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
     user = request.user
-    #print(request.user.is_society)
-    #print(post.author)
-    return render(request, 'everypost.html', {'post': post, 'user':user})
+    liked = False # 初期値はFalse
+    if post.like.filter(id=request.user.id).exists(): # 詳細ページにリクエストしたユーザーが既に「いいね」をした場合
+        liked = True # Trueを代入
+    return render(request, 'everypost.html', {'post': post, 'user':user, 'liked': liked}) # likedも渡す
 
 
 @login_required
@@ -338,11 +342,31 @@ def delete(request, post_id):
 
 
 # いいね機能の実装
-def goodfunc(request, pk):
-    post = BoardModel.objects.get(pk=pk)
+def goodfunc(request, post_id):
+    post = get_object_or_404(BoardModel, id=post_id)
     post.good = post.good + 1
     post.save()
-    return redirect('app:student_home')
+    return render(request,'everypost.html',{'post':post})
+
+
+# 制限付きいいね機能用関数
+def like(request):
+    post = get_object_or_404(BoardModel, id=request.POST.get('post_id')) # いいねをした記事のIDを取得しpost変数に代入
+    liked = False
+    if post.like.filter(id=request.user.id).exists():
+        post.like.remove(request.user) # いいねを既に押していたら除外
+        liked = False
+    else:
+        post.like.add(request.user) # いいねを押してなかったら追加
+        liked = True
+    # return redirect('app:everypost', post_id=post.id)
+    context={
+       'post': post,
+       'liked': liked,
+       }    
+    if request.is_ajax():
+        html = render_to_string('like.html', context, request=request )
+        return JsonResponse({'form': html})
 
 
 # Studentユーザに対するSocietyアカウントの一覧表示
