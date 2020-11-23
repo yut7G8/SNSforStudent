@@ -4,7 +4,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, Student, Company, BoardModel, Event, Information, ExtraInfo
+from .models import User, Student, Company, BoardModel, Event, Information, ExtraInfo, GENDER_CHOICES
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -17,6 +17,8 @@ import bootstrap_datepicker_plus as datetimepicker
 
 User = User
 Student = Student
+
+GENDER_CHOICES = GENDER_CHOICES + [('', '---------')]
 
 
 class LoginForm(AuthenticationForm):
@@ -58,11 +60,13 @@ class UserCreateForm(UserCreationForm):
 # StudentUserのsignup
 class StudentCreateForm(UserCreationForm):
 
+    gender = forms.ChoiceField(label='性別', choices=GENDER_CHOICES, required=False)
+
     class Meta: #(UserCreationForm.Meta):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('first_name', 'last_name', 'school_name', 'grade', 'email', )
+        fields = ('first_name', 'last_name', 'gender', 'school_name', 'grade', 'email', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

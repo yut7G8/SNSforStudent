@@ -41,6 +41,11 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password,grade,**extra_fields)
 
 
+GENDER_CHOICES = [
+    ('1', '女性'),
+    ('2', '男性'),
+]
+
 # SocietyUser
 # StudentUserもこのUser(for society)を引き継ぐ
 class User(AbstractBaseUser, PermissionsMixin):
@@ -50,6 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    gender = models.CharField('性別', max_length=1, choices=GENDER_CHOICES)
     society_name = models.CharField(_('society name'), max_length=150, blank=True)
     about_me = models.TextField(blank=True)
     image = models.ImageField(upload_to='',blank=True,null=True)

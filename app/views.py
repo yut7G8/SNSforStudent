@@ -639,8 +639,10 @@ def view_events(request, pk):
                         # 申し込み期限が過ぎていたらフラグを立てる
                         if event.deadline < datetime.now(tz=jst):
                             event.expired = True
+                        #print(event.images.url)
                         event_list.append(event)
-
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Studentユーザに対して自身がフォローしてるサークルの作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -650,6 +652,8 @@ def view_events(request, pk):
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
             event_list = Event.objects.filter(society=society)
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Societyユーザに対して自身が作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -703,6 +707,10 @@ def everyevent(request, pk, id):
                 for student in students:
                     for extrainfo in extrainfos:
                         if student == extrainfo.info_owner:
+                            if student.gender==1:
+                                student.gen = '女性'
+                            else:
+                                student.gen = '男性'
                             # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
                             student.info = extrainfo.info
                 return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
@@ -834,7 +842,7 @@ def edit_event(request, pk, id):
         else:
             form = CreateEventForm(instance=event)
             form_info = AddInformationForm(instance=information)
-        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
+        return render(request, 'edit_event.html', {'form': form, 'event':event})
     return redirect('app:logout')
 
 
