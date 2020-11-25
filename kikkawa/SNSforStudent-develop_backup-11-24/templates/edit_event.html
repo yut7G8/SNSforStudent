@@ -1,0 +1,45 @@
+{% extends 'base_society.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+<h1 class="mt-5 pt-4 text-center">イベント編集</h1>
+<form method="POST" enctype="multipart/form-data">
+ {% csrf_token %}
+
+ <label for="id_title" class="sr-only">イベント名</label>
+ {{ form.event_name|add_class:"form-control mb-3"}}
+
+ <label for="id_content" class="sr-only">本文</label>
+ {{ form.content|add_class:"form-control mb-3"}}
+ 
+ <p>開催日時</p>
+ <div style="text-align: center;">
+ <label for="id_event_date" class="sr-only">開催日時</label>
+{{ form.event_date }}
+ </div>
+ <br>
+ 
+ <p>申し込み締め切り</p>
+ <div style="text-align: center;">
+ <label for="id_deadline" class="sr-only">申し込み締め切り</label>
+ {{ form.deadline }}
+ </div>
+ <br>
+
+ <p>追加で入力して欲しい情報</p>
+ <div style="text-align: center;">
+ <label for="id_info" class="sr-only">追加情報</label>
+  {{form_info.info_title}}
+ </div>
+ <br>
+
+ <div style="text-align: center;">
+ <button type="submit" class="btn btn-block btn-outline-success">編集する</button>
+</div>
+</form>
+{% endblock %}
