@@ -1,0 +1,162 @@
+{% extends 'base_student.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <title>サンプル</title>
+  <!-- Bootstrap用CSSの読み込み -->
+  <link
+    rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  />
+  <!-- Bootstrap用JavaScriptの読み込み -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+
+{% block content %}
+<main class="p-3">
+    <style>
+        ul {
+            width: 50%;
+            margin: auto;
+        }
+    </style>
+
+  <!-- 2個分のタブ -->
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="#photo1" class="nav-link active" data-toggle="tab">サークル</a>
+    </li>
+    <li class="nav-item">
+      <a href="#photo2" class="nav-link" data-toggle="tab">企業</a>
+    </li>
+    <li class="nav-item">
+      <a href="#photo3" class="nav-link" data-toggle="tab">ハッシュタグ</a>
+    </li>
+  </ul>
+  <center>
+  <div class="tab-content">
+    <div id="photo1" class="tab-pane active">
+        <div class="container">
+            <!-- 検索結果の数 -->
+            {% if query %}
+            <p class="text-center font-weight-bold h4">検索結果は、{{number_society}}件</p>
+            {% endif%}
+            <!-- 検索結果の数 -->
+            {% if query %}
+             <div class="container">
+                {% for society in object_list_author %} 
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <br>
+                            <div class="card-body">
+                                <!--<p class="card-text">This page is for students.</p>-->
+                                <!--<p>サークル：{{society.society_name}}</p>-->
+                                <p><a href="#">{{society.society_name}}</a></p>
+                                <p>{{society.school_name}}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                  <div class="btn-group">
+                                    {% if society.created %}
+                                    <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
+                                    {% else %}
+                                    <a href="{%url 'app:follow' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
+                                      <!-- <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>-->
+                                    {% endif %}
+                                  </div>
+                                  <small class="text-muted">9 mins</small>
+                                </div>
+                              </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            
+                </div>
+                {% endif%}
+        </div>
+      </div>
+
+    <div id="photo2" class="tab-pane">
+        <div class="container">
+            <!-- 検索結果の数 -->
+            {% if query %}
+            <p class="text-center font-weight-bold h4">検索結果は、{{number_company}}件</p>
+            {% endif%}
+            <!-- 検索結果の数 -->
+            {% if query %}
+             <div class="container">
+                {% for company in object_list_author_company %} 
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <br>
+                            <div class="card-body">
+                                <!--<p class="card-text">This page is for students.</p>-->
+                                <!--<p>サークル：{{society.society_name}}</p>-->
+                                <p><a href="#">{{company.company_name}}</a></p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                  <div class="btn-group">
+                                    {% if company.created %}
+                                    <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
+                                    {% else %}
+                                    <a href="#" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
+                                    {% endif %}
+                                  </div>
+                                  <small class="text-muted">9 mins</small>
+                                </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                {% endfor %}
+              </div>
+                {% endif%}
+          </div>
+      </div>
+
+
+    <div id="photo3" class="tab-pane">
+        <div class="container">
+            <!-- 検索結果の数 -->
+            {% if query %}
+            <p class="text-center font-weight-bold h4">検索結果は、{{object_list_title.count}}件</p>
+            {% endif%}
+            <!-- 検索結果の数 -->
+
+            {% if query %}
+            {% for item in object_list_title %}
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                  <!--<svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Student</text></svg>-->
+                  <br>
+                  <p><img src="{{item.images.url}}" height="225" style="display: block; margin: auto;"></p>
+                  <div class="card-body">
+                    <!--<p class="card-text">This page is for students.</p>-->
+                    <p><a href="{% url 'app:everypost' post_id=item.id %}">{{item.title}}</a></p>
+                    <p><a href="#">投稿者:{{item.author}}</a></p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="btn-group">
+                        <!--<button type="button" href="{%url 'app:good' item.pk %}" class="btn btn-sm btn-outline-secondary" aria-pressed="true">good:{{item.good}}</button>-->
+                        <a href="#" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">good：{{item.good}}</a>
+                        <button type="button" href="#" class="btn btn-sm btn-outline-secondary">Edit</butto>
+                      </div>
+                      <small class="text-muted">9 mins</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+  </div>
+  </center>
+</main>
+{% endblock content %}

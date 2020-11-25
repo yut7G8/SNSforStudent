@@ -1,0 +1,18 @@
+{% extends 'base_2.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'jumbotron.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+
+<div style="margin-top: 120px">
+    {% csrf_token %} 
+<p>
+    会員登録確認メールを送信しました。まだ、会員登録は完了していません。<br>
+    確認メールを送信しましたので、確認メールに記載されているリンクから本登録を行ってください。
+</p>
+</div>
+
+{% endblock content %}

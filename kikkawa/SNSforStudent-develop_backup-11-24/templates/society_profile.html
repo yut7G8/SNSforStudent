@@ -1,0 +1,31 @@
+{% extends 'base_society.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+{% if user.image %}
+<img style="width:200px; height: 200px; object-fit:cover; border-radius:50%; ;" class="card-img-top" src="{{ user.image.url }}"> 
+{% endif %}
+<table class="table">
+    <tbody>
+        <tr>
+            <th>サークル名</th>
+            <td>{{ user.society_name }}</td>
+        </tr>
+        <tr>
+            <th>学校</th>
+            <td>{{ user.school_name }}</td>
+        </tr>
+        <tr>
+          <th>ひとこと</th>
+          <td>{{ user.about_me }}</td>
+        </tr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-primary" href="{% url 'app:society_profile_update' user.pk %}">プロフィール更新ページ</a>
+{% endblock %}
+</html>
