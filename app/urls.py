@@ -3,7 +3,7 @@ from . import views
 from .views import (
     selectfunc, loginfunc, student_home, society_home, company_home, SignUpView, detailfunc, goodfunc,
     view_societies, follow_view, unfollow_view, detail_society,
-    student_profile
+    student_profile,
 )
 
 
@@ -23,7 +23,7 @@ urlpatterns = [
     
     path('student_home/<int:pk>',student_home,name='student_home'),
     path('society_home/<int:pk>',society_home,name='society_home'),
-    path('company_home',company_home,name='company_home'),
+    #path('company_home',company_home,name='company_home'),
 
     path('view_societies/<int:pk>',view_societies,name='view_societies'),
     path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
@@ -62,5 +62,19 @@ urlpatterns = [
     path('edit_event/<int:pk>/<int:id>/',views.edit_event,name='edit_event'),
     path('delete_event/<int:pk>/<int:id>/', views.delete_event, name='delete_event'), # サークルユーザによるイベント削除
 
+
+    #companyの初期画面
+    path('company_home/<int:pk>',company_home,name='company_home'),
+    #companyのprofile
+    #path('company_profile/<int:pk>/', views.CompanyProfile.as_view(), name='company_profile'),
+    #path('company_profile_update/<int:pk>/', views.CompanyProfileUpdate.as_view(), name='company_profile_update'),
+    #企業の投稿
+    #path('add_company/<int:pk>', views.add_company, name='add_company'), 
+    #path('edit_company/<int:post_id>/', views.edit_company, name='edit_company'), # 編集機能の追加
+    #path('delete_company/<int:post_id>/', views.delete_company, name='delete_company'), # 削除機能の追加
+    #企業一覧
+    #path('view_companies/<int:pk>',view_companies,name='view_companies'),
+    #検索機能
+    #path('search/<int:pk>',searchfunc,name='search')
     
 ]

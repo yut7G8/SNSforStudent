@@ -66,7 +66,7 @@ def loginfunc(request):
             if user_login.is_society:
                 return redirect('app:society_home', pk=user.pk)
             if user_login.is_company:
-                return redirect('app:company_home')
+                return redirect('app:company_home',pk=user.pk)
         else:
             return render(request, 'login.html', {'error':'メールアドレスかパスワードが間違っています'})
     else:
@@ -118,8 +118,12 @@ def society_home(request, pk):
 # CompanyUserのhome画面
 @login_required
 @company_required
-def company_home(request):
-    return render(request,'company_home.html')
+def company_home(request, pk):
+    if request.user.pk == pk:
+        posts = BoardModel.objects.filter(user=request.user)
+        return render(request, 'company_home.html', {'object':posts})
+    else:
+        return redirect('app:logout')
 
 
 class Logout(LogoutView):
@@ -530,7 +534,7 @@ def follow_from_detail(request, *args, **kwargs):
             messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return redirect('app:detail_society' , pk=request.user.pk, email=following.email)
+    return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
 
 
 # アンフォロー

@@ -47,24 +47,23 @@
 
 <div class="card text-secondary" style="margin-top: 55px;">
  {% if post.images %}
- <img style="width: 400px; max-height: 500;" class="img-fluid mx-auto" src="{{ post.images.url }}">
+ <img style="width: 100%; max-height: 500;" class="img-fluid mx-auto" src="{{ post.images.url }}">
  {% else %}
  <div class="p-1 border border-secondary text-center pt-5" style="min-width: 500; min-height: 400;">No images</div>
- {% endif %}  
- <div class="card-body">
+ {% endif %}  <div class="card-body">
    <h3 class="card-title font-weight-bold text-center">{{ post.title }}</h3>
    <div class="p-3">
    <p class="card-text">{{ post.content }}</p>
    {% if user.is_student %}
    <a href="{%url 'app:detail_society' user.pk post.user.id %}"><p>投稿者　{{post.author}}</p></a>
-   <a href="{%url 'app:good' post_id=post.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">good：{{post.good}}</a>
+   <div id="like">
+    {% include 'like.html' %}
+   </div>
    {% else %}
    <p>投稿者　{{post.author}}</p>
    {% endif %}
-   <!-- <p>いいね(・∀・)ｲｲﾈ!!　{{post.good}}</p> -->
-   <p>閲覧数　{{post.read}}</p>
-   <p>{{post.readtext}}</p>
    {% if user.is_society %}
+    <p>いいね数 {{post.like.count}}</p>
     <a href="{% url 'app:edit' post_id=post.id %}"><button type="button" class="btn btn-outline-primary">編集</button></a>
     <a href="{% url 'app:delete' post_id=post.id %}"><button type="button" class="btn btn-outline-danger">削除</button></a>
    {% endif %}
