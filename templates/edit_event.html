@@ -14,27 +14,25 @@
  <label for="id_title" class="sr-only">イベント名</label>
  {{ form.event_name|add_class:"form-control mb-3"}}
 
+ <div class="mb-3 form-control text-secondary">
+    <label>画像</label>
+        {{ form.images }}
+</div>
+
  <label for="id_content" class="sr-only">本文</label>
  {{ form.content|add_class:"form-control mb-3"}}
- 
- <p>開催日時</p>
- <div style="text-align: center;">
- <label for="id_event_date" class="sr-only">開催日時</label>
-{{ form.event_date }}
- </div>
- <br>
- 
+
  <p>申し込み締め切り</p>
  <div style="text-align: center;">
  <label for="id_deadline" class="sr-only">申し込み締め切り</label>
  {{ form.deadline }}
  </div>
  <br>
-
- <p>追加で入力して欲しい情報</p>
+ 
+ <p>開催日時</p>
  <div style="text-align: center;">
- <label for="id_info" class="sr-only">追加情報</label>
-  {{form_info.info_title}}
+ <label for="id_event_date" class="sr-only">開催日時</label>
+{{ form.event_date }}
  </div>
  <br>
 

@@ -23,7 +23,7 @@
                         {% if company.connected %}
                         <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
                         {% else %}
-                          <a href="#" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
+                          <a href="{%url 'app:follow_company' company.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
                         {% endif %}
                       </div>
                       <small class="text-muted">9 mins</small>

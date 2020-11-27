@@ -57,6 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
     gender = models.CharField('性別', max_length=1, choices=GENDER_CHOICES)
     society_name = models.CharField(_('society name'), max_length=150, blank=True)
+    company_name = models.CharField(_('company name'), max_length=150, blank=True)
     about_me = models.TextField(blank=True)
     image = models.ImageField(upload_to='',blank=True,null=True)
 
