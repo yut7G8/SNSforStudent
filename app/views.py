@@ -110,7 +110,8 @@ def society_home(request, pk):
     #object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
     if request.user.pk == pk:
         posts = BoardModel.objects.filter(user=request.user)
-        return render(request, 'society_home.html', {'object':posts})
+        society = User.objects.get(pk=pk)
+        return render(request, 'society_home.html', {'object':posts,'society':society})
     else:
         return redirect('app:logout')
 
