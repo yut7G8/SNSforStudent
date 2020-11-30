@@ -51,20 +51,26 @@
       <h1 class="mt-5 pt-4 text-center">サークル用投稿一覧</h1>
       <div class="d-flex justify-content-center flex-wrap">
       {% for post in object %}
-      <a href="{% url 'app:everypost' post_id=post.id %}">
-      <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
-        {% if post.images %}
-          <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
-        {% else %}
-          <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
-        {% endif %}
-        <h4 class="card-title">{{post.title|truncatechars:10 | linebreaksbr}}</h4>
+      <div class="card m-4" style="width: 300px; max-height: 490;">
+        <a href="{% url 'app:everypost' post_id=post.id %}">
+          {% if post.images %}
+            <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+          {% else %}
+            <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
+          {% endif %}
+        </a>
+        <hr class="mt-0">
         <p class="card-text">
-        　{{ post.content|truncatechars:17 }}
+          {% if society.image %}
+          <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ society.image.url }}" alt="no img">
+          {% endif %}
+          {{post.author}}
         </p>
-        <p>投稿者　{{post.author}}</p>
+        <h4 class="card-title">
+          <a href="{% url 'app:everypost' post_id=post.id %}">{{post.title|truncatechars:10 | linebreaksbr}}</a>          </h4>
+        <p class="card-text">　{{ post.content|truncatechars:17 }}</p>
         <p>投稿日 {{post.created_at}}</p>
-      </a>
+      </div>
       {% endfor %}
   
     </div>

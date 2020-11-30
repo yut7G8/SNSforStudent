@@ -74,7 +74,14 @@
 
 
                     {% if user.is_student %}
-                      <p>サークル: <a href="{%url  'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+                      <p class="card-text">
+                        <a href="{%url  'app:detail_society' user.pk event.society.id %}">
+                          {% if event.society.image %}
+                          <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
+                          {% endif %}
+                          {{event.society.society_name}}
+                        </a>
+                      </p>
                       <div class="d-flex justify-content-between align-items-center">
                       {% if event.joined %}
                         <div class="btn-group">
