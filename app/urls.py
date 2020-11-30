@@ -41,7 +41,10 @@ urlpatterns = [
     path('society_profile/<int:pk>/', views.SocietyProfile.as_view(), name='society_profile'),
     path('society_profile_update/<int:pk>/', views.SocietyProfileUpdate.as_view(), name='society_profile_update'),
 
-    path('follow/<email>', views.follow_view, name='follow'),
+    # 改良版
+    path('follow_button/<email>', views.follow, name='follow'),
+    # 現状のフォロー
+    path('follow/<email>', views.follow_view, name='follow_view'),
     path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
 

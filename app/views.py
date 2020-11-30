@@ -420,7 +420,7 @@ def like(request):
     context={
        'post': post,
        'liked': liked,
-       }    
+       }
     if request.is_ajax():
         html = render_to_string('like.html', context, request=request )
         return JsonResponse({'form': html})
@@ -486,7 +486,7 @@ def detail_society(request, pk, id):
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
-                society.created=True
+                society.connected=True
         return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
     else:
         return redirect('app:logout')
@@ -557,6 +557,57 @@ class CompanyProfileUpdate(OnlyYouMixin, generic.UpdateView):
 
     def get_success_url(self):
         return resolve_url('app:company_profile', pk=self.kwargs['pk'])
+
+
+# フォロー改良版
+def follow(request, *args, **kwargs):
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Society
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        return redirect('app:view_societies' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            print("creating now")
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            # フラグを立てる
+            following.connected = True
+        else:
+            print("removing now")
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+            # フラグをおろす
+            following.connected = False
+
+    context={
+       'society': following,
+       #'liked': liked,
+        }
+
+    print(request)
+    print(request.is_ajax())
+    
+    if request.is_ajax():
+        html = render_to_string('follow.html', context, request=request )
+        return JsonResponse({'form': html})
 
 
 # フォロー
