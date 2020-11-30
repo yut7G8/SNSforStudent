@@ -3,11 +3,7 @@ from . import views
 from .views import (
     selectfunc, loginfunc, student_home, society_home, company_home, SignUpView, detailfunc, goodfunc,
     view_societies, follow_view, unfollow_view, detail_society,
-<<<<<<< HEAD
-    student_profile
-=======
     student_profile,view_companies,searchfunc
->>>>>>> kikkawa3
 )
 
 
@@ -66,9 +62,6 @@ urlpatterns = [
     path('edit_event/<int:pk>/<int:id>/',views.edit_event,name='edit_event'),
     path('delete_event/<int:pk>/<int:id>/', views.delete_event, name='delete_event'), # サークルユーザによるイベント削除
 
-<<<<<<< HEAD
-    
-=======
     #橘川が加えた(11/24)--------------------------
     #companyの初期画面
     path('company_home/<int:pk>',company_home,name='company_home'),
@@ -84,5 +77,4 @@ urlpatterns = [
     #検索機能
     path('search/<int:pk>',searchfunc,name='search')
 
->>>>>>> kikkawa3
 ]
