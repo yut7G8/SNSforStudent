@@ -13,13 +13,12 @@ from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
-    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm,
-    AddInformationForm, InputInformationForm,
+    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
 
-from .models import User, Student, Company, BoardModel, Connection, Event, Information, ExtraInfo
+from .models import User, Student, Company, BoardModel, Connection, Event, Information
 from .decorators import student_required, society_required, company_required
 
 from django.contrib.auth.forms import UserCreationForm
@@ -36,8 +35,6 @@ from datetime import datetime
 from pytz import timezone, utc
 from tzlocal import get_localzone
 import pytz
-
-from extra_views import CreateWithInlinesView, InlineFormSet
 
 from django.template.loader import render_to_string
 from django.http import JsonResponse
@@ -271,7 +268,7 @@ class UserCreateComplete(generic.TemplateView):
 # 各投稿の詳細ページに飛ぶ
 def detailfunc(request, pk):
     #object = BoardModel.objects.get(pk=pk)
-    object = BoardModel.objects.all().order_by('-readtext') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
+    object = BoardModel.objects.all().order_by('-created_at') # BordModelモデルの記事（objects）を全て(all())作成された順番（order_by('-readtext')）に取得してobject変数に代入
     return render(request, 'detail.html', {'object':object})
 
 
@@ -398,17 +395,13 @@ def view_societies(request, pk):
 def detail_society(request, pk, id):
     if request.user.pk == pk:
         society = User.objects.get(id=id)
-        #サークルの投稿取得
-        posts = BoardModel.objects.filter(user=society)
-        #イベントの投稿取得
-        events = Event.objects.filter(society=society)
         #print(society_pk)
         #society = get_object_or_404(User, pk=society_pk)
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
                 society.created=True
-        return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
+        return render(request, 'detail_society.html', {'society':society})
     else:
         return redirect('app:logout')
 
@@ -577,31 +570,23 @@ def unfollow_view(request, *args, **kwargs):
 
 @login_required
 @society_required
+# Societyユーザによるイベント作成
 def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
     if request.user.pk == pk:
         if request.method == "POST":
-            # イベント作成フォーム
             form = CreateEventForm(request.POST, request.FILES)
-            # 追加情報入力フォーム(サークル)
-            form_info = AddInformationForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save(commit=False)
                 # イベントの主催者にログインユーザ(サークル)を登録
                 event.society = request.user
                 event.save()
-                info = form_info.save(commit=False)
-                # 追加情報とイベントを紐付け
-                info.event = event
-                info.save()
                 return redirect('app:view_events', pk=request.user.pk)
         else:   
             form = CreateEventForm()
-            form_info = AddInformationForm()
-        return render(request, 'create_event.html', {'form': form, 'form_info':form_info})
+        return render(request, 'create_event.html', {'form': form})
     else:
         return redirect('app:logout')
-
 
 
 @login_required
@@ -666,7 +651,6 @@ def everyevent(request, pk, id):
 
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
-        information = get_object_or_404(Information, event=event)
 
         # 日本時間
         jst = pytz.timezone('Asia/Tokyo')
@@ -689,35 +673,11 @@ def everyevent(request, pk, id):
 
         # Societyユーザに対する表示
         elif user.is_society:
-
-            # 追加入力がある場合
-            if information.info_title != '':
-                # html表示のためにフラグを立てておく
-                event.flag = True
-                # 追加情報のタイトルをhtmlに渡す用
-                event.extra = information.info_title
-                # 学生に入力してもらった追加情報を取得
-                extrainfos = ExtraInfo.objects.filter(source=information)
-                # イベント参加者情報を取得
-                students = event.students.all()
-                for student in students:
-                    for extrainfo in extrainfos:
-                        if student == extrainfo.info_owner:
-                            # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
-                            student.info = extrainfo.info
-                return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
-            
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
     return redirect('app:logout') 
         
 
-
-# 流れ
-# 追加情報あり: join_event_comfirm → join_event_comfirm.html → join_event_comfirm(追加情報の保存) → join_event(参加者登録)
-# 追加情報なし: join_event_comfirm → join_event_comfirm.html → join_event(参加者登録)
-@login_required
-@student_required
 # Studentユーザへのイベント参加確認画面の表示
 def join_event_confirm(request, pk, id):
     # ユーザ認証(url書き換えによるログイン偽装防止)
@@ -725,31 +685,6 @@ def join_event_confirm(request, pk, id):
         # イベント情報取得
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
-
-        # 追加情報モデル取得
-        information = get_object_or_404(Information, event=event)
-
-        # 追加で入力すべき情報がある場合
-        if information.info_title != '':
-            # html表示のためにフラグを立てる
-            event.flag = True
-            if request.method == "POST":
-                # 追加情報入力フォーム取得
-                form = InputInformationForm(request.POST, request.FILES)
-                if form.is_valid():
-                    info = form.save(commit=False)
-                    # 追加情報のタイトル情報(サークルが決めたものとの紐付け)
-                    info.source = information
-                    # 入力した学生ユーザとの紐付け
-                    info.info_owner = request.user
-                    # 保存
-                    info.save()
-                    return redirect('app:join_event', pk=user.pk, id=id)
-            else:
-                # 追加情報入力フォーム取得
-                form = InputInformationForm()
-            return render(request, 'join_event_confirm.html', {'event': event, 'user':user, 'information':information, 'form':form})
-
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 
     else:
@@ -771,8 +706,7 @@ def join_event(request, pk, id):
         # 変更内容保存
         event.save()
         # 確認
-        #print(event.students.all())
-
+        print(event.students.all())
         return redirect('app:view_events', pk=request.user.pk)
     else:
         return redirect('app:logout') 
@@ -786,18 +720,10 @@ def cancel_event(request, pk, id):
         # 該当イベント取得
         event = get_object_or_404(Event, id=id)
         students = event.students.all()
-        information = get_object_or_404(Information, event=event)
-
         # イベント参加者からログインユーザを探し削除
         for student in students:
             if student == request.user:
                 event.students.remove(student)
-
-        if information.info_title != '':
-            extrainfos = ExtraInfo.objects.filter(source=information)
-            for info in extrainfos:
-                if info.info_owner == request.user:
-                    info.delete()
 
         #return redirect('app:everyevent', pk=request.user.pk, id=id)
         return redirect('app:view_events', pk=request.user.pk)
@@ -807,35 +733,13 @@ def cancel_event(request, pk, id):
 
 
 # Societyユーザによるイベントの編集
-# このやり方だと途中から403forbitten
-'''class EditEvent(OnlyYouMixin, generic.UpdateView):
+class EditEvent(OnlyYouMixin, generic.UpdateView):
     model = Event
     form_class = EditEventForm
     template_name = 'edit_event.html'
 
     def get_success_url(self):
-        return resolve_url('app:view_events', pk=self.kwargs['pk'])'''
-
-# クラスじゃなくて関数の使用で逃げる
-@login_required
-@society_required
-# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
-def edit_event(request, pk, id):
-    event = get_object_or_404(Event, id=id)
-    information = get_object_or_404(Information, event=event)
-    if(event.society.username==request.user.username):
-        if request.method == "POST":
-            form = CreateEventForm(request.POST, request.FILES, instance=event)
-            form_info = AddInformationForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                #form_info.save()
-                return redirect('app:everyevent', pk=pk, id=id)
-        else:
-            form = CreateEventForm(instance=event)
-            form_info = AddInformationForm(instance=information)
-        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
-    return redirect('app:logout')
+        return resolve_url('app:view_events', pk=self.kwargs['pk'])
 
 
 # Societyユーザによるイベントの削除

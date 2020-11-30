@@ -61,9 +61,9 @@
     <div class="d-flex justify-content-center flex-wrap">
     {% for post in object_list %}
     
-    <div class="card m-4" style="width: 300px; max-height: 490;">
+    <div class="card m-4" style="min-width: 300; max-height: 490;">
       {% if post.images %}
-        <img style=" max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
+        <img style="width: 300px; max-height: 300;" class="card-img-top" src="{{ post.images.url }}"> 
         <hr>
       {% else %}
         <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
@@ -75,11 +75,12 @@
       　{{ post.content|truncatechars:17 }}
       </p>
       <p>　投稿者　{{post.author}}</p>
-      <!-- <p>{{post.good}}</p>
-      <p>{{post.read}}</p> -->
-      <p>{{post.readtext}}</p>
+      <p>　投稿日　{{post.created_at}}</p>
+      <p>　いいね数　{{post.like.count}}</p>
+      <!-- <div id="like">
+        {% include 'like.html' %}
+      </div> -->
     </div>
-      
     {% endfor %}
   </div>
 </div>

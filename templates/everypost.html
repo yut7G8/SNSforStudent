@@ -60,7 +60,8 @@
     {% include 'like.html' %}
    </div>
    {% else %}
-   <p>投稿者　{{post.author}}</p>
+   <p>　投稿者　{{post.author}}</p>
+   <p>　投稿日　{{post.created_at}}</p>
    {% endif %}
    {% if user.is_society %}
     <p>いいね数 {{post.like.count}}</p>

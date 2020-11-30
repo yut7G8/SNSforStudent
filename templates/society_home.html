@@ -63,9 +63,7 @@
         　{{ post.content|truncatechars:17 }}
         </p>
         <p>投稿者　{{post.author}}</p>
-        <!-- <p>{{post.good}}</p>
-        <p>{{post.read}}</p> -->
-        <p>{{post.readtext}}</p>
+        <p>投稿日 {{post.created_at}}</p>
       </a>
       {% endfor %}
   
