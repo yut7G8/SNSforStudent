@@ -14,7 +14,7 @@ from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
     StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm,
-    AddInformationForm, InputInformationForm,CompanyProfileUpdateForm
+    AddInformationForm, InputInformationForm, CompanyProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -119,7 +119,7 @@ def society_home(request, pk):
 # CompanyUserのhome画面
 @login_required
 @company_required
-def company_home(request,pk):
+def company_home(request, pk):
     if request.user.pk == pk:
         posts = BoardModel.objects.filter(user=request.user)
         return render(request, 'company_home.html', {'object':posts})
@@ -419,7 +419,7 @@ def like(request):
     context={
        'post': post,
        'liked': liked,
-       }    
+       }
     if request.is_ajax():
         html = render_to_string('like.html', context, request=request )
         return JsonResponse({'form': html})
@@ -484,7 +484,7 @@ def detail_society(request, pk, id):
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
-                society.created=True
+                society.connected=True
         return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
     else:
         return redirect('app:logout')
@@ -555,6 +555,58 @@ class CompanyProfileUpdate(OnlyYouMixin, generic.UpdateView):
     def get_success_url(self):
         return resolve_url('app:company_profile', pk=self.kwargs['pk'])
 
+
+# フォロー改良版
+def follow(request, *args, **kwargs):
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Society
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        return redirect('app:view_societies' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            print("creating now")
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            # フラグを立てる
+            following.connected = True
+        else:
+            print("removing now")
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+            # フラグをおろす
+            following.connected = False
+
+    context={
+       'society': following,
+       #'liked': liked,
+        }
+
+    print(request)
+    print(request.is_ajax())
+    
+    if request.is_ajax():
+        html = render_to_string('follow.html', context, request=request )
+        return JsonResponse({'form': html})
+
+
 # フォロー
 @login_required
 @student_required
@@ -621,7 +673,41 @@ def follow_from_detail(request, *args, **kwargs):
             messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return redirect('app:detail_society' , pk=request.user.pk, email=following.email)
+    return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+
+@login_required
+@student_required
+def follow_company(request, *args, **kwargs):
+    user_list = User.objects.all()
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Company
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        #return render(request, 'society_list.html', {'society_list':society_list})
+        return redirect('app:view_societies' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            messages.success(request, '{}をフォローしました'.format(following.username))
+        else:
+            messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return redirect('app:view_companies' , pk=request.user.pk)
 
 
 # アンフォロー
@@ -730,8 +816,10 @@ def view_events(request, pk):
                         # 申し込み期限が過ぎていたらフラグを立てる
                         if event.deadline < datetime.now(tz=jst):
                             event.expired = True
+                        #print(event.images.url)
                         event_list.append(event)
-
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Studentユーザに対して自身がフォローしてるサークルの作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -741,6 +829,8 @@ def view_events(request, pk):
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
             event_list = Event.objects.filter(society=society)
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Societyユーザに対して自身が作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -794,6 +884,10 @@ def everyevent(request, pk, id):
                 for student in students:
                     for extrainfo in extrainfos:
                         if student == extrainfo.info_owner:
+                            if student.gender==1:
+                                student.gen = '女性'
+                            else:
+                                student.gen = '男性'
                             # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
                             student.info = extrainfo.info
                 return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
@@ -948,7 +1042,7 @@ def edit_event(request, pk, id):
         else:
             form = CreateEventForm(instance=event)
             form_info = AddInformationForm(instance=information)
-        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
+        return render(request, 'edit_event.html', {'form': form, 'event':event})
     return redirect('app:logout')
 
 

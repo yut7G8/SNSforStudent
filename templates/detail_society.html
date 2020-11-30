@@ -15,18 +15,20 @@
     <p>サークル名：{{society.society_name}}</p>
     <p>投稿者：{{society.school_name}}</p>
     <p>代表者連絡先：{{society.email}}</p>
+
+    <!--<div id="follow">
+      {% include 'follow.html' %}
+    </div>-->
+
     <div class="btn-group">
-      {% if society.created %}
+      {% if society.connected %}
       <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
       {% else %}
         <a href="{%url 'app:follow_from_detail' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
-        <!-- <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>-->
+        <!-- <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a> -->
       {% endif %}
     </div>
- 
-    <!--<a href="#" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">いいねする</a>-->
-    <!--<a href="{%url 'app:follow' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
-    <a href="{%url 'app:unfollow' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー解除</a>-->
+
   </div>
  
  

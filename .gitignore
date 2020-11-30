@@ -5,3 +5,4 @@ app/migrations/
 media/
 venv/
 *.pyc
+

@@ -3,7 +3,7 @@ from . import views
 from .views import (
     selectfunc, loginfunc, student_home, society_home, company_home, SignUpView, detailfunc, goodfunc,
     view_societies, follow_view, unfollow_view, detail_society,
-    student_profile,view_companies,searchfunc
+    student_profile, view_companies, searchfunc, 
 )
 
 
@@ -23,7 +23,7 @@ urlpatterns = [
     
     path('student_home/<int:pk>',student_home,name='student_home'),
     path('society_home/<int:pk>',society_home,name='society_home'),
-    path('company_home',company_home,name='company_home'),
+    #path('company_home',company_home,name='company_home'),
 
     path('view_societies/<int:pk>',view_societies,name='view_societies'),
     path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
@@ -41,9 +41,14 @@ urlpatterns = [
     path('society_profile/<int:pk>/', views.SocietyProfile.as_view(), name='society_profile'),
     path('society_profile_update/<int:pk>/', views.SocietyProfileUpdate.as_view(), name='society_profile_update'),
 
-    path('follow/<email>', views.follow_view, name='follow'),
+    # 改良版
+    path('follow_button/<email>', views.follow, name='follow'),
+    # 現状のフォロー
+    path('follow/<email>', views.follow_view, name='follow_view'),
     path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
+
+    path('follow_company/<email>', views.follow_company, name='follow_company'),
 
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage
@@ -76,5 +81,5 @@ urlpatterns = [
     path('view_companies/<int:pk>',view_companies,name='view_companies'),
     #検索機能
     path('search/<int:pk>',searchfunc,name='search')
-
+    
 ]
