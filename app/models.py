@@ -205,5 +205,3 @@ class ExtraInfo(models.Model):
 
     def __str__(self):
         return self.info
-    
->>>>>>> kikkawa3
