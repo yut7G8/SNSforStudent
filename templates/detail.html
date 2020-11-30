@@ -42,7 +42,7 @@
 <a href="{% url 'app:everypost' post_id=post.id %}">
 <div class="card m-4" style="min-width: 300; max-height: 490;"></div>
  {% if post.images %}
-   <img style="max-width: 300; max-height: 300;" class="card-img-top" src="{{ post.images.url }}">
+   <img style="width: 300px; max-height:300px" class="card-img-top" src="{{ post.images.url }}">
   {% else %}
    <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
  {% endif %}

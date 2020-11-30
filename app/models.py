@@ -41,6 +41,11 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password,grade,**extra_fields)
 
 
+GENDER_CHOICES = [
+    ('1', '女性'),
+    ('2', '男性'),
+]
+
 # SocietyUser
 # StudentUserもこのUser(for society)を引き継ぐ
 class User(AbstractBaseUser, PermissionsMixin):
@@ -50,8 +55,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
+    gender = models.CharField('性別', max_length=1, choices=GENDER_CHOICES)
     society_name = models.CharField(_('society name'), max_length=150, blank=True)
+    company_name = models.CharField(_('company name'), max_length=150, blank=True)
     about_me = models.TextField(blank=True)
+    image = models.ImageField(upload_to='',blank=True,null=True)
 
     followers_number = models.IntegerField(_('followers_number'),null=True,blank=True,default=0)
     following_number = models.IntegerField(_('following_number'),null=True,blank=True,default=0)
@@ -139,7 +147,8 @@ class BoardModel(models.Model):
     good = models.IntegerField(default=0)
     read = models.IntegerField(default=0)
     readtext = models.CharField(max_length=200)
-    # tag = models.ForeignKey(Tag, verbose_name = 'タグ', on_delete=models.PROTECT) # TagクラスとBoardModleの紐づけ
+    # いいね機能. ManytoMabyFieldを使用.
+    like = models.ManyToManyField(User, related_name='like', blank=True)
 
     def __str__(self):
         return self.title
@@ -169,7 +178,7 @@ class Event(models.Model):
     # イベント内容
     content = models.TextField()
     # 宣伝用画像
-    images = models.ImageField(upload_to='')
+    images = models.ImageField(upload_to='',blank=True,null=True)
     # イベント開催日
     event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
     # 申し込み締め切り日時

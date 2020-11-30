@@ -4,7 +4,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from .models import User, Student, Company, BoardModel, Event, Information, ExtraInfo
+from .models import User, Student, Company, BoardModel, Event, Information, ExtraInfo, GENDER_CHOICES
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -17,6 +17,8 @@ import bootstrap_datepicker_plus as datetimepicker
 
 User = User
 Student = Student
+
+GENDER_CHOICES = GENDER_CHOICES + [('', '---------')]
 
 
 class LoginForm(AuthenticationForm):
@@ -58,11 +60,13 @@ class UserCreateForm(UserCreationForm):
 # StudentUserのsignup
 class StudentCreateForm(UserCreationForm):
 
+    gender = forms.ChoiceField(label='性別', choices=GENDER_CHOICES, required=False)
+
     class Meta: #(UserCreationForm.Meta):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('first_name', 'last_name', 'school_name', 'grade', 'email', )
+        fields = ('first_name', 'last_name', 'gender', 'school_name', 'grade', 'email', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -90,7 +94,7 @@ class CompanyCreateForm(UserCreationForm):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('email', )
+        fields = ('company_name', 'email', )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -115,7 +119,7 @@ class StudentProfileUpdateForm(forms.ModelForm):
     """studentのプロフィール更新用のフォーム定義"""
     class Meta:
         model = User
-        fields =['first_name', 'last_name', 'about_me', 'school_name', 'grade'] 
+        fields =['image','first_name', 'last_name', 'about_me', 'school_name', 'grade'] 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -127,12 +131,25 @@ class SocietyProfileUpdateForm(forms.ModelForm):
     """societyのプロフィール更新用のフォーム定義"""
     class Meta:
         model = User
-        fields =['society_name', 'school_name', 'about_me'] 
+        fields =['image','society_name', 'school_name', 'about_me'] 
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+
+
+class CompanyProfileUpdateForm(forms.ModelForm):
+    """societyのプロフィール更新用のフォーム定義"""
+    class Meta:
+        model = User
+        fields =['image','company_name','about_me'] 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
     
 # 投稿用のフォームを作成
 class PostAddForm(forms.ModelForm):
@@ -150,7 +167,7 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ['event_name', 'content', 'event_date', 'deadline',]
+        fields = ['event_name', 'content', 'event_date', 'deadline','images']
 
 
 # サークルが作成する追加情報欄
@@ -173,7 +190,7 @@ class InputInformationForm(forms.ModelForm):
 
 
 # サークルユーザ用イベント編集フォーム
-# 使わないかも
+# 使わない
 class EditEventForm(forms.ModelForm):
 
     class Meta:
@@ -188,3 +205,4 @@ class EditEventForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+

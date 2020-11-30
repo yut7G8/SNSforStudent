@@ -14,7 +14,7 @@ from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
     StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm,
-    AddInformationForm, InputInformationForm,
+    AddInformationForm, InputInformationForm, CompanyProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -38,6 +38,11 @@ from tzlocal import get_localzone
 import pytz
 
 from extra_views import CreateWithInlinesView, InlineFormSet
+
+from django.template.loader import render_to_string
+from django.http import JsonResponse
+
+from django.core.mail import EmailMessage
 
 # ログイン前のページ表示
 def selectfunc(request):
@@ -63,7 +68,7 @@ def loginfunc(request):
             if user_login.is_society:
                 return redirect('app:society_home', pk=user.pk)
             if user_login.is_company:
-                return redirect('app:company_home')
+                return redirect('app:company_home',pk=user.pk)
         else:
             return render(request, 'login.html', {'error':'メールアドレスかパスワードが間違っています'})
     else:
@@ -115,8 +120,12 @@ def society_home(request, pk):
 # CompanyUserのhome画面
 @login_required
 @company_required
-def company_home(request):
-    return render(request,'company_home.html')
+def company_home(request, pk):
+    if request.user.pk == pk:
+        posts = BoardModel.objects.filter(user=request.user)
+        return render(request, 'company_home.html', {'object':posts})
+    else:
+        return redirect('app:logout')
 
 
 class Logout(LogoutView):
@@ -277,9 +286,10 @@ def detailfunc(request, pk):
 def everypost(request, post_id): # urls.pyから送られてくるrequestとeverypost_idを取得
     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
     user = request.user
-    #print(request.user.is_society)
-    #print(post.author)
-    return render(request, 'everypost.html', {'post': post, 'user':user})
+    liked = False # 初期値はFalse
+    if post.like.filter(id=request.user.id).exists(): # 詳細ページにリクエストしたユーザーが既に「いいね」をした場合
+        liked = True # Trueを代入
+    return render(request, 'everypost.html', {'post': post, 'user':user, 'liked': liked}) # likedも渡す
 
 
 @login_required
@@ -303,6 +313,26 @@ def add(request, pk):
 
 
 @login_required
+@company_required
+# 投稿フォーム用のadd関数
+def add_company(request, pk):
+    if request.user.pk == pk:
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.author = request.user.company_name
+                post.save()
+                return redirect('app:company_home', pk=request.user.pk)
+        else:   
+            form = PostAddForm()
+        return render(request, 'add_company.html', {'form': form})
+    else:
+        return redirect('app:logout')
+
+
+@login_required
 @society_required
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit(request, post_id):
@@ -321,6 +351,26 @@ def edit(request, post_id):
     return redirect('app:logout')
 
 
+#companyの投稿の編集
+@login_required
+@company_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit_company(request, post_id):
+    post = get_object_or_404(BoardModel, id=post_id)
+    #print(post.user.username)
+    #print(request.user.username)
+    if(post.user.username==request.user.username):
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES, instance=post)
+            if form.is_valid():
+                form.save()
+                return redirect('app:everypost', post_id=post.id)
+        else:
+            form = PostAddForm(instance=post)
+        return render(request, 'edit_company.html', {'form': form, 'post':post })
+    return redirect('app:logout')
+
+
 # 削除フォーム用のdelete関数
 # 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
 @login_required
@@ -331,6 +381,17 @@ def delete(request, post_id):
    return redirect('app:society_home', pk=request.user.pk)
 
 
+#companyの投稿の削除
+# 削除フォーム用のdelete関数
+# 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
+@login_required
+@company_required
+def delete_company(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   post.delete()
+   return redirect('app:company_home', pk=request.user.pk)
+
+
 # # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
 # def everypostforStuednt(request, post_id):
 #     post = get_object_or_404(BoardModel, id=post_id) # idが存在しなかった場合、「404 not found」
@@ -338,11 +399,31 @@ def delete(request, post_id):
 
 
 # いいね機能の実装
-def goodfunc(request, pk):
-    post = BoardModel.objects.get(pk=pk)
+def goodfunc(request, post_id):
+    post = get_object_or_404(BoardModel, id=post_id)
     post.good = post.good + 1
     post.save()
-    return redirect('app:student_home')
+    return render(request,'everypost.html',{'post':post})
+
+
+# 制限付きいいね機能用関数
+def like(request):
+    post = get_object_or_404(BoardModel, id=request.POST.get('post_id')) # いいねをした記事のIDを取得しpost変数に代入
+    liked = False
+    if post.like.filter(id=request.user.id).exists():
+        post.like.remove(request.user) # いいねを既に押していたら除外
+        liked = False
+    else:
+        post.like.add(request.user) # いいねを押してなかったら追加
+        liked = True
+    # return redirect('app:everypost', post_id=post.id)
+    context={
+       'post': post,
+       'liked': liked,
+       }
+    if request.is_ajax():
+        html = render_to_string('like.html', context, request=request )
+        return JsonResponse({'form': html})
 
 
 # Studentユーザに対するSocietyアカウントの一覧表示
@@ -368,19 +449,45 @@ def view_societies(request, pk):
         return redirect('app:logout')
 
 
+# Studentユーザに対するcompanyアカウントの一覧表示
+@login_required
+@student_required
+def view_companies(request, pk):
+    # ユーザ制限
+    if request.user.pk == pk:
+        # Companyアカウントのみ取得
+        user_list = User.objects.filter(is_company=True)
+        company_list = []
+        for company in user_list:
+            # 各サークルアカウントのfollower(student)を取得
+            connections = Connection.objects.filter(following=company)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    # ログインしたstudentユーザがcompanyをフォローしたらフラグを立てる(保存はしない)
+                    company.connected=True
+            company_list.append(company)
+        return render(request, 'company_list.html', {'company_list':company_list})
+    else:
+        return redirect('app:logout')
+
+
 # Studentユーザに対する各Societyアカウントの詳細表示
 @login_required
 @student_required
 def detail_society(request, pk, id):
     if request.user.pk == pk:
         society = User.objects.get(id=id)
+        #サークルの投稿取得
+        posts = BoardModel.objects.filter(user=society)
+        #イベントの投稿取得
+        events = Event.objects.filter(society=society)
         #print(society_pk)
         #society = get_object_or_404(User, pk=society_pk)
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
-                society.created=True
-        return render(request, 'detail_society.html', {'society':society})
+                society.connected=True
+        return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
     else:
         return redirect('app:logout')
 
@@ -435,6 +542,73 @@ class SocietyProfileUpdate(OnlyYouMixin, generic.UpdateView):
 
     def get_success_url(self):
         return resolve_url('app:society_profile', pk=self.kwargs['pk'])
+
+
+#企業のプロフィール表示-------------------------------------------------------
+class CompanyProfile(OnlyYouMixin, generic.DetailView):
+    model = User
+    template_name = 'company_profile.html'
+
+#企業のプロフィールのアップデート-----------------------------------------------
+class CompanyProfileUpdate(OnlyYouMixin, generic.UpdateView):
+    model = User
+    form_class = CompanyProfileUpdateForm
+    template_name = 'company_profile_update.html'
+
+    def get_success_url(self):
+        return resolve_url('app:company_profile', pk=self.kwargs['pk'])
+
+
+# フォロー改良版
+def follow(request, *args, **kwargs):
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Society
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        return redirect('app:view_societies' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            print("creating now")
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            # フラグを立てる
+            following.connected = True
+        else:
+            print("removing now")
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+            # フラグをおろす
+            following.connected = False
+
+    context={
+       'society': following,
+       #'liked': liked,
+        }
+
+    print(request)
+    print(request.is_ajax())
+    
+    if request.is_ajax():
+        html = render_to_string('follow.html', context, request=request )
+        return JsonResponse({'form': html})
+
 
 # フォロー
 @login_required
@@ -502,7 +676,41 @@ def follow_from_detail(request, *args, **kwargs):
             messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
-    return redirect('app:detail_society' , pk=request.user.pk, email=following.email)
+    return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+
+@login_required
+@student_required
+def follow_company(request, *args, **kwargs):
+    user_list = User.objects.all()
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Company
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        #return render(request, 'society_list.html', {'society_list':society_list})
+        return redirect('app:view_societies' , pk=request.user.pk)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            messages.success(request, '{}をフォローしました'.format(following.username))
+        else:
+            messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return redirect('app:view_companies' , pk=request.user.pk)
 
 
 # アンフォロー
@@ -611,8 +819,10 @@ def view_events(request, pk):
                         # 申し込み期限が過ぎていたらフラグを立てる
                         if event.deadline < datetime.now(tz=jst):
                             event.expired = True
+                        #print(event.images.url)
                         event_list.append(event)
-
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Studentユーザに対して自身がフォローしてるサークルの作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -622,6 +832,8 @@ def view_events(request, pk):
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
             event_list = Event.objects.filter(society=society)
+            # 締め切り日時で並べ換える
+            event_list = sorted(event_list, key=lambda x:x.deadline)
             # Societyユーザに対して自身が作成したイベントを表示する。
             return render(request, 'event_list.html', {'event_list':event_list})
 
@@ -675,6 +887,10 @@ def everyevent(request, pk, id):
                 for student in students:
                     for extrainfo in extrainfos:
                         if student == extrainfo.info_owner:
+                            if student.gender==1:
+                                student.gen = '女性'
+                            else:
+                                student.gen = '男性'
                             # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
                             student.info = extrainfo.info
                 return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
@@ -806,7 +1022,7 @@ def edit_event(request, pk, id):
         else:
             form = CreateEventForm(instance=event)
             form_info = AddInformationForm(instance=information)
-        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
+        return render(request, 'edit_event.html', {'form': form, 'event':event})
     return redirect('app:logout')
 
 
@@ -823,3 +1039,78 @@ def delete_event(request, pk, id):
         return redirect('app:logout')
 
 
+#検索部分の新しいコード
+def searchfunc(request,pk,*args, **kwargs):
+    query = request.GET.get('q')
+    if query:
+        object_list = BoardModel.objects.all()
+
+        #サークル名-------------------------------
+        user_list = User.objects.all().filter(
+            Q(society_name__icontains=query,
+            is_society=True)
+        ).distinct()
+        society_list = []
+        for society in user_list:
+            connections = Connection.objects.filter(following=society)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    society.created=True
+            society_list.append(society)
+        
+        number_society = len(society_list)
+
+        object_list_author = society_list
+
+        #企業名----------------------------------------
+        user_list_company = User.objects.all().filter(
+            Q(company_name__icontains=query,
+            is_company=True)
+        ).distinct()
+        company_list = []
+        for company in user_list_company:
+            connections = Connection.objects.filter(following=company)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    company.created=True
+            company_list.append(company)
+        
+        number_company = len(company_list)
+
+        object_list_author_company = company_list
+
+        #タグ----------------------------------------------
+        tag = '#'+query
+
+        object_list_title = object_list.filter(
+                Q(content__icontains=tag)
+            ).distinct()
+
+        #print(object_list_title[0].user.email)
+        
+        # if (object_list_author is not None) and (object_list_title is not None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        # elif (object_list_author is  None) and (object_list_title is not None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        # elif (object_list_author is not None) and (object_list_title is None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+        
+        # else:
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'object_list_author_company':object_list_author_company,'query': query,'number_society':number_society,'number_company':number_company})
+
+    else:
+        object_list = BoardModel.objects.all()
+
+        object_list_author = object_list.filter(
+            Q(author__icontains=query)
+        ).distinct()
+
+
+        object_list_title = object_list.filter(
+                Q(title__icontains=query)
+            ).distinct()
+        return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':object_list_author,'object_list_author_company':object_list_author,'query': query})

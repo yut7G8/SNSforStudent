@@ -3,7 +3,7 @@ from . import views
 from .views import (
     selectfunc, loginfunc, student_home, society_home, company_home, SignUpView, detailfunc, goodfunc,
     view_societies, follow_view, unfollow_view, detail_society,
-    student_profile
+    student_profile, view_companies, searchfunc, 
 )
 
 
@@ -23,31 +23,33 @@ urlpatterns = [
     
     path('student_home/<int:pk>',student_home,name='student_home'),
     path('society_home/<int:pk>',society_home,name='society_home'),
-    path('company_home',company_home,name='company_home'),
+    #path('company_home',company_home,name='company_home'),
 
     path('view_societies/<int:pk>',view_societies,name='view_societies'),
     path('detail_society/<int:pk>/<int:id>/',detail_society,name='detail_society'),
 
-    #path('detail/<int:pk>', detailfunc, name='detail'),
-    path('good/<int:pk>', goodfunc, name='good'),
+    # いいね機能用のURL++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    path('detail/<int:post_id>/', goodfunc, name='good'),
+
+    path('like/', views.like, name='like'),
+
+    #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     path('student_profile/<int:pk>', student_profile, name='student_profile'),
     path('student_profile_update/<int:pk>',views.StudentProfileUpdate.as_view(),name='student_profile_update'),
-    #path('<slug:username>', views.StudentProfileDetailView.as_view(), name='profile'),
-    #path('profile/<email>', views.StudentProfileDetailView.as_view(), name='profile'),
-    #path('<slug:username>/edit', views.StudentProfileUpdateView.as_view(), name='edit'),
-    #path('student_profile/<int:pk>', views.StudentProfile.as_view(), name='student_profile'),
 
     path('society_profile/<int:pk>/', views.SocietyProfile.as_view(), name='society_profile'),
     path('society_profile_update/<int:pk>/', views.SocietyProfileUpdate.as_view(), name='society_profile_update'),
 
-    path('follow/<email>', views.follow_view, name='follow'),
+    # 改良版
+    path('follow_button/<email>', views.follow, name='follow'),
+    # 現状のフォロー
+    path('follow/<email>', views.follow_view, name='follow_view'),
     path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
-    #path('<slug:username>/follow', views.follow_view, name='follow'),
-    #path('<slug:username>/unfollow', views.unfollow_view, name='unfollow'),
 
-    #path('detail/', detailfunc, name='detailfunc'), # views.pyのdetailfuncを参照
+    path('follow_company/<email>', views.follow_company, name='follow_company'),
+
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage
     path('add/<int:pk>', views.add, name='add'), # 投稿フォーム用のpath(仮)設定
@@ -65,5 +67,19 @@ urlpatterns = [
     path('edit_event/<int:pk>/<int:id>/',views.edit_event,name='edit_event'),
     path('delete_event/<int:pk>/<int:id>/', views.delete_event, name='delete_event'), # サークルユーザによるイベント削除
 
+    #橘川が加えた(11/24)--------------------------
+    #companyの初期画面
+    path('company_home/<int:pk>',company_home,name='company_home'),
+    #companyのprofile
+    path('company_profile/<int:pk>/', views.CompanyProfile.as_view(), name='company_profile'),
+    path('company_profile_update/<int:pk>/', views.CompanyProfileUpdate.as_view(), name='company_profile_update'),
+    #企業の投稿
+    path('add_company/<int:pk>', views.add_company, name='add_company'), 
+    path('edit_company/<int:post_id>/', views.edit_company, name='edit_company'), # 編集機能の追加
+    path('delete_company/<int:post_id>/', views.delete_company, name='delete_company'), # 削除機能の追加
+    #企業一覧
+    path('view_companies/<int:pk>',view_companies,name='view_companies'),
+    #検索機能
+    path('search/<int:pk>',searchfunc,name='search')
     
 ]

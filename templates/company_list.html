@@ -9,7 +9,7 @@
 <main role="main">
 <div class="album py-5 bg-light">
     <div class="container">
-    {% for society in society_list %} 
+    {% for company in company_list %} 
     <div class="row">
         <div class="col-md-4">
             <div class="card mb-4 shadow-sm">
@@ -17,15 +17,13 @@
                 <div class="card-body">
                     <!--<p class="card-text">This page is for students.</p>-->
                     <!--<p>サークル：{{society.society_name}}</p>-->
-                    <p><a href="{%url  'app:detail_society' user.pk society.id %}">{{society.society_name}}</a></p>
-                    <p>{{society.school_name}}</p>
+                    <p><a href="#">{{company.company_name}}</a></p>
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="btn-group">
-                        {% if society.connected %}
+                        {% if company.connected %}
                         <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
                         {% else %}
-                          <a href="{%url 'app:follow_view' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
-                          <!-- <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>-->
+                          <a href="{%url 'app:follow_company' company.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
                         {% endif %}
                       </div>
                       <small class="text-muted">9 mins</small>

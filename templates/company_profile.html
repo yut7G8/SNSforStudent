@@ -1,4 +1,4 @@
-{% extends 'base_society.html' %}
+{% extends 'base_company.html' %}
 {% load static %}
 
 {% block customcss %}
@@ -12,12 +12,8 @@
 <table class="table">
     <tbody>
         <tr>
-            <th>サークル名</th>
-            <td>{{ user.society_name }}</td>
-        </tr>
-        <tr>
-            <th>学校</th>
-            <td>{{ user.school_name }}</td>
+            <th>企業名</th>
+            <td>{{ user.company_name }}</td>
         </tr>
         <tr>
           <th>ひとこと</th>
@@ -26,6 +22,6 @@
     </tbody>
 </table>
 <br>
-<a class="btn btn-primary" href="{% url 'app:society_profile_update' user.pk %}">プロフィール更新ページ</a>
+<a class="btn btn-primary" href="{% url 'app:company_profile_update' user.pk %}">プロフィール更新ページ</a>
 {% endblock %}
 </html>
