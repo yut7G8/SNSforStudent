@@ -18,6 +18,7 @@
               <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
               <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
               <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+              <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
               <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
           </ul>
         </div>
