@@ -90,8 +90,7 @@ class CompanyCreateForm(UserCreationForm):
         # Userでokそう
         model = User
         #model = Student
-        fields = ('email', )
-
+        fields = ('email','company_name' )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
@@ -133,6 +132,20 @@ class SocietyProfileUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
+<<<<<<< HEAD
+=======
+
+class CompanyProfileUpdateForm(forms.ModelForm):
+    """societyのプロフィール更新用のフォーム定義"""
+    class Meta:
+        model = User
+        fields =['image','company_name','about_me'] 
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+>>>>>>> kikkawa3
     
 # 投稿用のフォームを作成
 class PostAddForm(forms.ModelForm):

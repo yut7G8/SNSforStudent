@@ -13,12 +13,13 @@ from django.template.loader import render_to_string
 from django.views import generic
 from .forms import (
     LoginForm, UserCreateForm, StudentCreateForm, CompanyCreateForm, PostAddForm, 
-    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm
+    StudentProfileUpdateForm, CreateEventForm, EditEventForm, SocietyProfileUpdateForm,
+    AddInformationForm, InputInformationForm,CompanyProfileUpdateForm
 )
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, DetailView, UpdateView
 
-from .models import User, Student, Company, BoardModel, Connection, Event, Information
+from .models import User, Student, Company, BoardModel, Connection, Event, Information, ExtraInfo
 from .decorators import student_required, society_required, company_required
 
 from django.contrib.auth.forms import UserCreationForm
@@ -35,10 +36,12 @@ from datetime import datetime
 from pytz import timezone, utc
 from tzlocal import get_localzone
 import pytz
+from extra_views import CreateWithInlinesView, InlineFormSet
 
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 
+from django.core.mail import EmailMessage
 # ログイン前のページ表示
 def selectfunc(request):
     return render(request,'select.html')
@@ -63,7 +66,7 @@ def loginfunc(request):
             if user_login.is_society:
                 return redirect('app:society_home', pk=user.pk)
             if user_login.is_company:
-                return redirect('app:company_home')
+                return redirect('app:company_home',pk=user.pk)
         else:
             return render(request, 'login.html', {'error':'メールアドレスかパスワードが間違っています'})
     else:
@@ -116,8 +119,12 @@ def society_home(request, pk):
 # CompanyUserのhome画面
 @login_required
 @company_required
-def company_home(request):
-    return render(request,'company_home.html')
+def company_home(request,pk):
+    if request.user.pk == pk:
+        posts = BoardModel.objects.filter(user=request.user)
+        return render(request, 'company_home.html', {'object':posts})
+    else:
+        return redirect('app:logout')
 
 
 class Logout(LogoutView):
@@ -305,6 +312,26 @@ def add(request, pk):
 
 
 @login_required
+@company_required
+# 投稿フォーム用のadd関数
+def add_company(request, pk):
+    if request.user.pk == pk:
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.author = request.user.company_name
+                post.save()
+                return redirect('app:company_home', pk=request.user.pk)
+        else:   
+            form = PostAddForm()
+        return render(request, 'add_company.html', {'form': form})
+    else:
+        return redirect('app:logout')
+
+
+@login_required
 @society_required
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit(request, post_id):
@@ -323,6 +350,26 @@ def edit(request, post_id):
     return redirect('app:logout')
 
 
+#companyの投稿の編集
+@login_required
+@company_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit_company(request, post_id):
+    post = get_object_or_404(BoardModel, id=post_id)
+    #print(post.user.username)
+    #print(request.user.username)
+    if(post.user.username==request.user.username):
+        if request.method == "POST":
+            form = PostAddForm(request.POST, request.FILES, instance=post)
+            if form.is_valid():
+                form.save()
+                return redirect('app:everypost', post_id=post.id)
+        else:
+            form = PostAddForm(instance=post)
+        return render(request, 'edit_company.html', {'form': form, 'post':post })
+    return redirect('app:logout')
+
+
 # 削除フォーム用のdelete関数
 # 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
 @login_required
@@ -331,6 +378,17 @@ def delete(request, post_id):
    post = get_object_or_404(BoardModel, id=post_id)
    post.delete()
    return redirect('app:society_home', pk=request.user.pk)
+
+
+#companyの投稿の削除
+# 削除フォーム用のdelete関数
+# 削除機能はHTMLファイルを作成する必要がない。everypost.htmlに削除ボタンを作成。
+@login_required
+@company_required
+def delete_company(request, post_id):
+   post = get_object_or_404(BoardModel, id=post_id)
+   post.delete()
+   return redirect('app:company_home', pk=request.user.pk)
 
 
 # # 学生側は別のeveyypost(編集削除できない)ページを作る。そのための関数。
@@ -389,6 +447,27 @@ def view_societies(request, pk):
     else:
         return redirect('app:logout')
 
+# Studentユーザに対するcompanyアカウントの一覧表示
+@login_required
+@student_required
+def view_companies(request, pk):
+    # ユーザ制限
+    if request.user.pk == pk:
+        # Companyアカウントのみ取得
+        user_list = User.objects.filter(is_company=True)
+        company_list = []
+        for company in user_list:
+            # 各サークルアカウントのfollower(student)を取得
+            connections = Connection.objects.filter(following=company)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    # ログインしたstudentユーザがcompanyをフォローしたらフラグを立てる(保存はしない)
+                    company.connected=True
+            company_list.append(company)
+        return render(request, 'company_list.html', {'company_list':company_list})
+    else:
+        return redirect('app:logout')
+
 
 # Studentユーザに対する各Societyアカウントの詳細表示
 @login_required
@@ -396,13 +475,17 @@ def view_societies(request, pk):
 def detail_society(request, pk, id):
     if request.user.pk == pk:
         society = User.objects.get(id=id)
+        #サークルの投稿取得
+        posts = BoardModel.objects.filter(user=society)
+        #イベントの投稿取得
+        events = Event.objects.filter(society=society)
         #print(society_pk)
         #society = get_object_or_404(User, pk=society_pk)
         connections = Connection.objects.filter(following=society)
         for connection in connections:
             if(connection.follower==request.user):
                 society.created=True
-        return render(request, 'detail_society.html', {'society':society})
+        return render(request, 'detail_society.html', {'society':society, 'posts':posts,'events':events})
     else:
         return redirect('app:logout')
 
@@ -457,6 +540,20 @@ class SocietyProfileUpdate(OnlyYouMixin, generic.UpdateView):
 
     def get_success_url(self):
         return resolve_url('app:society_profile', pk=self.kwargs['pk'])
+
+#企業のプロフィール表示-------------------------------------------------------
+class CompanyProfile(OnlyYouMixin, generic.DetailView):
+    model = User
+    template_name = 'company_profile.html'
+
+#企業のプロフィールのアップデート-----------------------------------------------
+class CompanyProfileUpdate(OnlyYouMixin, generic.UpdateView):
+    model = User
+    form_class = CompanyProfileUpdateForm
+    template_name = 'company_profile_update.html'
+
+    def get_success_url(self):
+        return resolve_url('app:company_profile', pk=self.kwargs['pk'])
 
 # フォロー
 @login_required
@@ -576,16 +673,24 @@ def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
     if request.user.pk == pk:
         if request.method == "POST":
+            # イベント作成フォーム
             form = CreateEventForm(request.POST, request.FILES)
+            # 追加情報入力フォーム(サークル)
+            form_info = AddInformationForm(request.POST, request.FILES)
             if form.is_valid():
                 event = form.save(commit=False)
                 # イベントの主催者にログインユーザ(サークル)を登録
                 event.society = request.user
                 event.save()
+                info = form_info.save(commit=False)
+                # 追加情報とイベントを紐付け
+                info.event = event
+                info.save()
                 return redirect('app:view_events', pk=request.user.pk)
         else:   
             form = CreateEventForm()
-        return render(request, 'create_event.html', {'form': form})
+            form_info = AddInformationForm()
+        return render(request, 'create_event.html', {'form': form, 'form_info':form_info})
     else:
         return redirect('app:logout')
 
@@ -652,6 +757,7 @@ def everyevent(request, pk, id):
 
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
+        information = get_object_or_404(Information, event=event)
 
         # 日本時間
         jst = pytz.timezone('Asia/Tokyo')
@@ -674,11 +780,35 @@ def everyevent(request, pk, id):
 
         # Societyユーザに対する表示
         elif user.is_society:
+
+            # 追加入力がある場合
+            if information.info_title != '':
+                # html表示のためにフラグを立てておく
+                event.flag = True
+                # 追加情報のタイトルをhtmlに渡す用
+                event.extra = information.info_title
+                # 学生に入力してもらった追加情報を取得
+                extrainfos = ExtraInfo.objects.filter(source=information)
+                # イベント参加者情報を取得
+                students = event.students.all()
+                for student in students:
+                    for extrainfo in extrainfos:
+                        if student == extrainfo.info_owner:
+                            # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
+                            student.info = extrainfo.info
+                return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
+            
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
     return redirect('app:logout') 
         
 
+
+# 流れ
+# 追加情報あり: join_event_comfirm → join_event_comfirm.html → join_event_comfirm(追加情報の保存) → join_event(参加者登録)
+# 追加情報なし: join_event_comfirm → join_event_comfirm.html → join_event(参加者登録)
+@login_required
+@student_required
 # Studentユーザへのイベント参加確認画面の表示
 def join_event_confirm(request, pk, id):
     # ユーザ認証(url書き換えによるログイン偽装防止)
@@ -686,6 +816,31 @@ def join_event_confirm(request, pk, id):
         # イベント情報取得
         event = get_object_or_404(Event, id=id) # idが存在しなかった場合、「404 not found」
         user = request.user
+
+        # 追加情報モデル取得
+        information = get_object_or_404(Information, event=event)
+
+        # 追加で入力すべき情報がある場合
+        if information.info_title != '':
+            # html表示のためにフラグを立てる
+            event.flag = True
+            if request.method == "POST":
+                # 追加情報入力フォーム取得
+                form = InputInformationForm(request.POST, request.FILES)
+                if form.is_valid():
+                    info = form.save(commit=False)
+                    # 追加情報のタイトル情報(サークルが決めたものとの紐付け)
+                    info.source = information
+                    # 入力した学生ユーザとの紐付け
+                    info.info_owner = request.user
+                    # 保存
+                    info.save()
+                    return redirect('app:join_event', pk=user.pk, id=id)
+            else:
+                # 追加情報入力フォーム取得
+                form = InputInformationForm()
+            return render(request, 'join_event_confirm.html', {'event': event, 'user':user, 'information':information, 'form':form})
+
         return render(request, 'join_event_confirm.html', {'event': event, 'user':user})
 
     else:
@@ -707,7 +862,8 @@ def join_event(request, pk, id):
         # 変更内容保存
         event.save()
         # 確認
-        print(event.students.all())
+        #print(event.students.all())
+
         return redirect('app:view_events', pk=request.user.pk)
     else:
         return redirect('app:logout') 
@@ -721,10 +877,18 @@ def cancel_event(request, pk, id):
         # 該当イベント取得
         event = get_object_or_404(Event, id=id)
         students = event.students.all()
+        information = get_object_or_404(Information, event=event)
+
         # イベント参加者からログインユーザを探し削除
         for student in students:
             if student == request.user:
                 event.students.remove(student)
+
+        if information.info_title != '':
+            extrainfos = ExtraInfo.objects.filter(source=information)
+            for info in extrainfos:
+                if info.info_owner == request.user:
+                    info.delete()
 
         #return redirect('app:everyevent', pk=request.user.pk, id=id)
         return redirect('app:view_events', pk=request.user.pk)
@@ -734,14 +898,71 @@ def cancel_event(request, pk, id):
 
 
 # Societyユーザによるイベントの編集
-class EditEvent(OnlyYouMixin, generic.UpdateView):
+# このやり方だと途中から403forbitten
+'''class EditEvent(OnlyYouMixin, generic.UpdateView):
     model = Event
     form_class = EditEventForm
     template_name = 'edit_event.html'
 
     def get_success_url(self):
-        return resolve_url('app:view_events', pk=self.kwargs['pk'])
+        return resolve_url('app:view_events', pk=self.kwargs['pk'])'''
 
+# クラスじゃなくて関数の使用で逃げる
+@login_required
+@society_required
+# 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
+def edit_event(request, pk, id):
+    event = get_object_or_404(Event, id=id)
+    information = get_object_or_404(Information, event=event)
+    if(event.society.username==request.user.username):
+        if request.method == "POST":
+            form = CreateEventForm(request.POST, request.FILES, instance=event)
+            form_info = AddInformationForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                #form_info.save()
+
+                #メールを送る
+                shusaisha = event.society
+                eventnonamae = event.event_name
+                eventdate = event.event_date
+
+                connections = Connection.objects.filter(following=request.user)
+                followshiteruhito_email = []
+                for c in connections:
+                    followshiteruhito_email.append(c.follower.email)
+                # print('主催者',shusaisha)
+                # print('日付',eventdate)
+                # print('イベントの名前',eventnonamae)
+                
+                subject = "{}が主催者の{}開催の{}は変更になりました".format(shusaisha,eventdate,eventnonamae)
+                message = "イベントは主催者によって変更になったことをお知らせします"
+                from_email = request.user.email # 送信者
+                recipient_list = [request.user.email] # 宛先リスト
+                bcc =  followshiteruhito_email # BCCリスト
+                email = EmailMessage(subject, message, from_email, recipient_list, bcc)
+                email.send()
+
+
+                return redirect('app:everyevent', pk=pk, id=id)
+        else:
+            form = CreateEventForm(instance=event)
+            form_info = AddInformationForm(instance=information)
+        return render(request, 'edit_event.html', {'form': form, 'event':event, 'form_info': form_info })
+    return redirect('app:logout')
+
+
+# Societyユーザによるイベントの削除
+# @login_required
+# @society_required
+# def delete_event(request, pk, id):
+#     if request.user.pk == pk:
+#         event = get_object_or_404(Event, id=id)
+#         event.delete()
+#         return redirect('app:view_events', pk=request.user.pk)
+
+#     else:
+#         return redirect('app:logout')
 
 # Societyユーザによるイベントの削除
 @login_required
@@ -749,10 +970,108 @@ class EditEvent(OnlyYouMixin, generic.UpdateView):
 def delete_event(request, pk, id):
     if request.user.pk == pk:
         event = get_object_or_404(Event, id=id)
+        shusaisha = event.society
+        eventnonamae = event.event_name
+        eventdate = event.event_date
         event.delete()
+
+        connections = Connection.objects.filter(following=request.user)
+        followshiteruhito_email = []
+        for c in connections:
+            followshiteruhito_email.append(c.follower.email)
+        # print('主催者',shusaisha)
+        # print('日付',eventdate)
+        # print('イベントの名前',eventnonamae)
+        
+        subject = "{}が主催者の{}開催の{}は中止になりました".format(shusaisha,eventdate,eventnonamae)
+        message = "イベントは主催者によって中止になったことをお知らせします"
+        from_email = request.user.email # 送信者
+        recipient_list = [request.user.email] # 宛先リスト
+        bcc =  followshiteruhito_email # BCCリスト
+        email = EmailMessage(subject, message, from_email, recipient_list, bcc)
+        email.send()
+
         return redirect('app:view_events', pk=request.user.pk)
 
     else:
         return redirect('app:logout')
+
+
+#検索部分の新しいコード
+def searchfunc(request,pk,*args, **kwargs):
+    query = request.GET.get('q')
+    if query:
+        object_list = BoardModel.objects.all()
+
+        #サークル名-------------------------------
+        user_list = User.objects.all().filter(
+            Q(society_name__icontains=query,
+            is_society=True)
+        ).distinct()
+        society_list = []
+        for society in user_list:
+            connections = Connection.objects.filter(following=society)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    society.created=True
+            society_list.append(society)
+        
+        number_society = len(society_list)
+
+        object_list_author = society_list
+
+        #企業名----------------------------------------
+        user_list_company = User.objects.all().filter(
+            Q(company_name__icontains=query,
+            is_company=True)
+        ).distinct()
+        company_list = []
+        for company in user_list_company:
+            connections = Connection.objects.filter(following=company)
+            for connection in connections:
+                if (connection.follower==request.user):
+                    company.created=True
+            company_list.append(company)
+        
+        number_company = len(company_list)
+
+        object_list_author_company = company_list
+
+        #タグ----------------------------------------------
+        tag = '#'+query
+
+        object_list_title = object_list.filter(
+                Q(content__icontains=tag)
+            ).distinct()
+
+        #print(object_list_title[0].user.email)
+        
+        # if (object_list_author is not None) and (object_list_title is not None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        # elif (object_list_author is  None) and (object_list_title is not None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        # elif (object_list_author is not None) and (object_list_title is None):
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+        
+        # else:
+        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
+
+        return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'object_list_author_company':object_list_author_company,'query': query,'number_society':number_society,'number_company':number_company})
+
+    else:
+        object_list = BoardModel.objects.all()
+
+        object_list_author = object_list.filter(
+            Q(author__icontains=query)
+        ).distinct()
+
+
+        object_list_title = object_list.filter(
+                Q(title__icontains=query)
+            ).distinct()
+        return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':object_list_author,'object_list_author_company':object_list_author,'query': query})
+
 
 
