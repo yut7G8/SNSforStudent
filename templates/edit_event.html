@@ -18,6 +18,8 @@
     <label>画像</label>
         {{ form.images }}
 </div>
+<br>
+<br>
 
  <label for="id_content" class="sr-only">本文</label>
  {{ form.content|add_class:"form-control mb-3"}}
@@ -25,14 +27,16 @@
  <p>申し込み締め切り</p>
  <div style="text-align: center;">
  <label for="id_deadline" class="sr-only">申し込み締め切り</label>
- {{ form.deadline }}
+ <input type="datetime-local" name="deadline" placeholder="開催日時" required id="id_deadline">
+ <br>(変更前: {{ event.deadline }})
  </div>
  <br>
  
  <p>開催日時</p>
  <div style="text-align: center;">
  <label for="id_event_date" class="sr-only">開催日時</label>
-{{ form.event_date }}
+ <input type="datetime-local" name="event_date" placeholder="開催日時" required id="id_event_date">
+ <br>(変更前: {{ event.event_date }})
  </div>
  <br>
 

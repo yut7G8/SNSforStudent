@@ -90,19 +90,20 @@
       border-collapse: collapse;
       color: #333; /* 全体の文字色 */
       background-color: #f0f2f7; /* 全体の背景色 */
-      width: 100%;
     }
     th, td {
-      padding: 5px 15px;
+      padding: 5px 10px;
       border: solid 1px #adb3c1;
     }</style>
 
     {% if event.flag %}
-    <table>
+    <table width="100%">
       <tr>
         <th>姓</th>
         <th>名</th>
         <th>性別</th>
+        <th>大学</th>
+        <th>学年</th>
         <th>メールアドレス</th>
         <th>{{event.extra}}</th>
       </tr>
@@ -111,6 +112,8 @@
         <td>{{student.first_name}}</td>
         <td>{{student.last_name}}</td>
         <td>{{student.gen}}</td>
+        <td>{{student.school_name}}</td>
+        <td>{{student.grade}}</td>
         <td>{{student.email}}</td>
         <td>{{student.info}}</td>
       </tr>
@@ -118,11 +121,13 @@
     </table>
 
     {% else %}
-    <table>
+    <table width="100%">
       <tr>
         <th>姓</th>
         <th>名</th>
         <th>性別</th>
+        <th>大学</th>
+        <th>学年</th>
         <th>メールアドレス</th>
       </tr>
       {% for student in event.students.all%}
@@ -130,11 +135,25 @@
         <td>{{student.first_name}}</td>
         <td>{{student.last_name}}</td>
         <td>{{student.gen}}</td>
+        <td>{{student.school_name}}</td>
+        <td>{{student.grade}}</td>
         <td>{{student.email}}</td>
       </tr>
       {% endfor %}
     </table>
     {% endif %}
+
+    <br>
+    <table width="70%" align="center">
+      <tr>
+        <th>女性</th>
+        <th>{{students.female}}</th>
+        <th>男性</th>
+        <th>{{students.male}}</th>
+        <th>合計</th>
+        <th>{{students.count}}</th>
+      </tr>
+    </table>
 
    </div>
   </div>

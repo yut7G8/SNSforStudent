@@ -49,6 +49,7 @@ urlpatterns = [
     path('unfollow/<email>', views.unfollow_view, name='unfollow'),
 
     path('follow_company/<email>', views.follow_company, name='follow_company'),
+    path('follow_company2/<email>', views.follow_company_from_detail, name='follow_company_from_detail'),
 
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage
@@ -79,6 +80,7 @@ urlpatterns = [
     path('delete_company/<int:post_id>/', views.delete_company, name='delete_company'), # 削除機能の追加
     #企業一覧
     path('view_companies/<int:pk>',view_companies,name='view_companies'),
+    path('detail_company/<int:pk>/<int:id>/',views.detail_company,name='detail_company'),
     #検索機能
     path('search/<int:pk>',searchfunc,name='search')
     
