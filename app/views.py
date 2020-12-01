@@ -934,7 +934,7 @@ def unfollow_company_from_detail(request, *args, **kwargs):
 
 
 @login_required
-@society_required
+#@society_required
 # Societyユーザによるイベント作成
 def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
@@ -1005,7 +1005,7 @@ def view_events(request, pk):
             return render(request, 'event_list.html', {'event_list':event_list})
 
         # Societyユーザに対する表示
-        elif request.user.is_society:
+        elif request.user.is_society or request.user.is_company:
             # ログインしてるSocietyユーザの情報取得
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
@@ -1050,7 +1050,7 @@ def everyevent(request, pk, id):
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
         # Societyユーザに対する表示
-        elif user.is_society:
+        elif user.is_society or user.is_company:
 
             # 追加入力がある場合
             if information.info_title != '':
@@ -1077,6 +1077,24 @@ def everyevent(request, pk, id):
                                 students.male += 1
                             # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
                             student.info = extrainfo.info
+                return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
+
+            # 追加入力なしの場合
+            else:
+                # イベント参加者情報を取得
+                students = event.students.all()
+                # 参加者のうち男性の人数を記録
+                students.male = 0
+                # 参加者のうち女性の人数を記録
+                students.female = 0
+                for student in students:
+                    if student.gender==1:
+                        student.gen = '女性'
+                        students.female += 1
+                    else:
+                        student.gen = '男性'
+                        students.male += 1
+                    print(student.gen)
                 return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
             
             return render(request, 'everyevent.html', {'event': event, 'user':user})
@@ -1189,7 +1207,7 @@ def cancel_event(request, pk, id):
 
 # クラスじゃなくて関数の使用で逃げる
 @login_required
-@society_required
+#@society_required
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit_event(request, pk, id):
     event = get_object_or_404(Event, id=id)
@@ -1246,7 +1264,7 @@ def edit_event(request, pk, id):
 
 # Societyユーザによるイベントの削除
 @login_required
-@society_required
+#@society_required
 def delete_event(request, pk, id):
     if request.user.pk == pk:
         event = get_object_or_404(Event, id=id)

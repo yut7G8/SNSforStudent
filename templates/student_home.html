@@ -27,8 +27,9 @@
       </ul>
 
     <div class="tab-content">
-    <div id="society" class="tab-pane active">
 
+    <div id="society" class="tab-pane active">
+      <h2 class="mt-3 pt-2 text-center">サークル</h2>
     <div class="d-flex justify-content-center flex-wrap">
     {% for post in object_list %}
      {% if post.user.is_society %}
@@ -64,6 +65,7 @@
     </div>
 
     <div id="company" class="tab-pane active">
+      <h2 class="mt-3 pt-2 text-center">企業</h2>
       <div class="d-flex justify-content-center flex-wrap">
         {% for post in object_list %}
          {% if post.user.is_company %}
