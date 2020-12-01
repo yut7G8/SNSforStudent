@@ -46,10 +46,14 @@ urlpatterns = [
     # 現状のフォロー
     path('follow/<email>', views.follow_view, name='follow_view'),
     path('follow2/<email>', views.follow_from_detail, name='follow_from_detail'),
-    path('unfollow/<email>', views.unfollow_view, name='unfollow'),
+    path('unfollow/<email>', views.unfollow_view, name='unfollow_view'),
+    path('unfollow2/<email>', views.unfollow_from_detail, name='unfollow_from_detail'),
+    path('unfollow3/<email>', views.unfollow_from_profile, name='unfollow_from_profile'),
 
     path('follow_company/<email>', views.follow_company, name='follow_company'),
     path('follow_company2/<email>', views.follow_company_from_detail, name='follow_company_from_detail'),
+    path('unfollow_company/<email>', views.unfollow_company, name='unfollow_company'),
+    path('unfollow_company2/<email>', views.unfollow_company_from_detail, name='unfollow_company_from_detail'),
 
     path('detail/<int:post_id>/', views.everypost, name='everypost'), # views.pyのeverypost関数を参照
     # path('detail/<int:post_id>/', views.everypostforStuednt, name='everypostforStudent'), # 学生側の閲覧用everypage

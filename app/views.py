@@ -707,7 +707,7 @@ def follow_company(request, *args, **kwargs):
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
         #return render(request, 'society_list.html', {'society_list':society_list})
-        return redirect('app:view_societies' , pk=request.user.pk)
+        return redirect('app:view_companies' , pk=request.user.pk)
 
     if follower == following:
         messages.warning(request, '自分自身はフォローできませんよ')
@@ -742,7 +742,7 @@ def follow_company_from_detail(request, *args, **kwargs):
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
         #return render(request, 'society_list.html', {'society_list':society_list})
-        return redirect('app:view_companies' , pk=request.user.pk)
+        return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
 
     if follower == following:
         messages.warning(request, '自分自身はフォローできませんよ')
@@ -795,15 +795,142 @@ def unfollow_view(request, *args, **kwargs):
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
         #return render(request, 'society_list.html', {'society_list':society_list})
-        return redirect('app:student_profile', pk=request.user.pk)
+        return redirect('app:view_societies' , pk=request.user.pk)
         
     except Connection.DoesNotExist:
         messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
     #return render(request, 'society_list.html', {'society_list':society_list})
-    return redirect('app:student_profile', pk=request.user.pk)
+    return redirect('app:view_societies' , pk=request.user.pk)
 
+# アンフォロー
+@login_required
+@student_required
+def unfollow_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_from_profile(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:student_profile' , pk=request.user.pk)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:student_profile' , pk=request.user.pk)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_company(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:view_companies' , pk=request.user.pk)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:view_companies' , pk=request.user.pk)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_company_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
 
 
 @login_required

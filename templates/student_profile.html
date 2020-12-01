@@ -67,7 +67,7 @@
                         <p>所属大学：{{society.school_name}}</p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
-                            <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
+                            <a href="{%url 'app:unfollow_from_profile' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
                           </div>
                           <small class="text-muted">9 mins</small>
                         </div>
@@ -98,7 +98,7 @@
                           <p><a href="{%url 'app:detail_company' user.pk company.id %}">{{company.company_name}}</a></p>
                           <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                              <a href="{%url 'app:unfollow' company.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
+                              <a href="{%url 'app:unfollow_from_profile' company.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
                             </div>
                             <small class="text-muted">9 mins</small>
                           </div>

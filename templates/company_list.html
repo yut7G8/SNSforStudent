@@ -21,7 +21,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="btn-group">
                         {% if company.connected %}
-                        <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
+                        <a href="{%url 'app:unfollow_company' company.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
                         {% else %}
                           <a href="{%url 'app:follow_company' company.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
                         {% endif %}
