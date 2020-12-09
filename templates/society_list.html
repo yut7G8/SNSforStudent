@@ -1,0 +1,50 @@
+{% extends 'base_student.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+<main role="main">
+<div class="album py-5 bg-light">
+    <div class="container">
+    {% for society in society_list %} 
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <br>
+                <div class="card-body">
+                    <!--<p class="card-text">This page is for students.</p>-->
+                    <!--<p>サークル：{{society.society_name}}</p>-->
+                    <p class="card-text">
+                      <a href="{%url  'app:detail_society' user.pk society.id %}">
+                        {% if society.image %}
+                        <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ society.image.url }}" alt="no img">
+                        {% endif %}
+                        {{society.society_name}}
+                      </a>
+                    </p>
+                    <p>{{society.school_name}}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div class="btn-group">
+                        {% if society.connected %}
+                        <a href="#" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー済み</a>
+                        {% else %}
+                          <a href="{%url 'app:follow_view' society.email %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">フォロー</a>
+                          <!-- <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>-->
+                        {% endif %}
+                      </div>
+                      <small class="text-muted">9 mins</small>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    </div>
+</div>
+</main>
+{% endblock content %}
+</html>

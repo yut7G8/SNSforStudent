@@ -1,0 +1,21 @@
+{% extends 'base_2.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'jumbotron.css' %}">
+{% endblock customcss %}
+
+
+{% block content %}
+{% csrf_token %} 
+<div style="margin-top: 120px">
+
+<p>
+    本登録が完了しました。<br>
+    登録されたメールアドレスとパスワードでログインしてください。<br>
+    <a class="btn btn-primary btn-lg" href="{% url 'app:login' %}">ログイン</a>
+</p>
+
+</div>
+
+{% endblock content %}
