@@ -143,7 +143,11 @@ class BoardModel(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     author = models.CharField(max_length=100)
+<<<<<<< HEAD
     images = models.ImageField(upload_to='', blank=True)
+=======
+    images = models.ImageField(upload_to='')
+>>>>>>> kikkawa5
     good = models.IntegerField(default=0)
     read = models.IntegerField(default=0)
     readtext = models.CharField(max_length=200)
@@ -151,6 +155,12 @@ class BoardModel(models.Model):
     like = models.ManyToManyField(User, related_name='like', blank=True)
     created_at = models.DateTimeField('投稿日', default=timezone.now)
 
+<<<<<<< HEAD
+=======
+    #橘川追加
+    url = models.URLField(default=None)
+
+>>>>>>> kikkawa5
 
     def __str__(self):
         return self.title
@@ -186,6 +196,12 @@ class Event(models.Model):
     # 申し込み締め切り日時
     deadline = models.DateTimeField(verbose_name="締め切り日時", default=datetime.now)
 
+<<<<<<< HEAD
+=======
+    #橘川追加
+    url = models.URLField(default=None)
+
+>>>>>>> kikkawa5
     def __str__(self):
         return self.event_name
 

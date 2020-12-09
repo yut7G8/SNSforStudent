@@ -150,10 +150,13 @@ class CompanyProfileUpdateForm(forms.ModelForm):
     
 # 投稿用のフォームを作成
 class PostAddForm(forms.ModelForm):
+
+    url = forms.URLField(required=False)
+    
     class Meta:
         model = BoardModel # model変数にBoardModelを代入
         #fields = ['title', 'content', 'author', 'images', 'good', 'read', 'readtext'] # fields変数にフォームで使用するラベルと代入
-        fields = ['title', 'content', 'images']
+        fields = ['title', 'content', 'images','url']
 
 
 # サークルユーザ用イベント作成フォーム
