@@ -35,11 +35,27 @@
 </table>
 <br>
 <a class="btn btn-primary" href="{% url 'app:student_profile_update' user.pk %}">プロフィール更新ページ</a>
-<h3 style="text-align:center">フォローしてるサークル</h3>
-<main role="main">
+
+<div class="p-3">
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="#society" class="nav-link active" data-toggle="tab">サークル</a>
+    </li>
+    <li class="nav-item">
+      <a href="#company" class="nav-link" data-toggle="tab">企業</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div id="society" class="tab-pane active">
+
+    <h2 class="mt-3 pt-2 text-center">サークル</h2>
+
     <div class="album py-5 bg-light">
         <div class="container">
-        {% for society in following %} 
+        {% for society in following %}
+        {% if society.is_society %}
         <div class="row">
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
@@ -48,10 +64,10 @@
                         <!--<p class="card-text">This page is for students.</p>-->
                         <!--<p>サークル：{{society.society_name}}</p>-->
                         <p><a href="{%url 'app:detail_society' user.pk society.id %}">{{society.society_name}}</a></p>
-                        <p>{{society.school_name}}</p>
+                        <p>所属大学：{{society.school_name}}</p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
-                            <a href="{%url 'app:unfollow' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
+                            <a href="{%url 'app:unfollow_from_profile' society.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
                           </div>
                           <small class="text-muted">9 mins</small>
                         </div>
@@ -59,10 +75,44 @@
                 </div>
             </div>
         </div>
-        {% endfor %}
-    
+        {% endif %}
+        {% endfor %} 
         </div>
     </div>
-</main>
+    </div>
+
+    <div id="company" class="tab-pane">
+    <h2 class="mt-3 pt-2 text-center">企業</h2>
+  
+      <div class="album py-5 bg-light">
+          <div class="container">
+          {% for company in following %}
+          {% if company.is_company %}
+          <div class="row">
+              <div class="col-md-4">
+                  <div class="card mb-4 shadow-sm">
+                      <br>
+                      <div class="card-body">
+                          <!--<p class="card-text">This page is for students.</p>-->
+                          <!--<p>サークル：{{society.society_name}}</p>-->
+                          <p><a href="{%url 'app:detail_company' user.pk company.id %}">{{company.company_name}}</a></p>
+                          <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                              <a href="{%url 'app:unfollow_from_profile' company.email %}" class="btn btn-sm btn-outline-secondary" role="button" aria-pressed="true">フォロー解除</a>
+                            </div>
+                            <small class="text-muted">9 mins</small>
+                          </div>
+                        </div>
+                  </div>
+              </div>
+          </div>
+          {% endif %}
+          {% endfor %}      
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 </html>

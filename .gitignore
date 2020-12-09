@@ -1,12 +1,8 @@
-<<<<<<< HEAD
 db.sqlite3
 app/__pycache__/
 appproject/__pycache__/
 app/migrations/
 media/
 venv/
-=======
-
 *.pyc
-app/migrations
->>>>>>> 208b6623dd4d847a6ee61c014ce9916efade5887
+

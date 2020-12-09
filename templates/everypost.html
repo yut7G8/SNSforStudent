@@ -16,6 +16,7 @@
               <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
               <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
               <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+              <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
               <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
           </ul>
         </div>
@@ -125,12 +126,17 @@
     {% include 'like.html' %}
    </div>
    {% else %}
-   <p>投稿者　{{post.author}}</p>
+   <p>　投稿者　{{post.author}}</p>
+   <p>　投稿日　{{post.created_at}}</p>
    {% endif %}
    {% if user.is_society %}
     <p>いいね数 {{post.like.count}}</p>
     <a href="{% url 'app:edit' post_id=post.id %}"><button type="button" class="btn btn-outline-primary">編集</button></a>
     <a href="{% url 'app:delete' post_id=post.id %}"><button type="button" class="btn btn-outline-danger">削除</button></a>
+   {% endif %}
+   {% if user.is_company %}
+    <a href="{% url 'app:edit_company' post_id=post.id %}"><button type="button" class="btn btn-outline-primary">編集</button></a>
+    <a href="{% url 'app:delete_company' post_id=post.id %}"><button type="button" class="btn btn-outline-danger">削除</button></a>
    {% endif %}
  </div>
 </div>

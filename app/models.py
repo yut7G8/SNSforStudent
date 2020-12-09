@@ -149,6 +149,8 @@ class BoardModel(models.Model):
     readtext = models.CharField(max_length=200)
     # いいね機能. ManytoMabyFieldを使用.
     like = models.ManyToManyField(User, related_name='like', blank=True)
+    created_at = models.DateTimeField('投稿日', default=timezone.now)
+
 
     def __str__(self):
         return self.title
@@ -187,7 +189,6 @@ class Event(models.Model):
     def __str__(self):
         return self.event_name
 
-
 # イベント参加時にサークルユーザが決定する追加情報
 class Information(models.Model):
     # 結びついているイベント
@@ -210,4 +211,3 @@ class ExtraInfo(models.Model):
 
     def __str__(self):
         return self.info
-    
