@@ -1,0 +1,10 @@
+{% if request.user.is_authenticated %}
+   <form action="{% url 'app:follow' society.email %}" method="POST">
+     {% csrf_token %}
+     {% if following.connected %}
+      <button type="submit" id="follow" name="post_id" value="{{post.id}}" class="btn"><i class="fas fa-lg fa-heart like-red"></i></button>
+      {% else %}
+      <button type="submit" id="follow" name="post_id" value="{{post.id}}" class="btn"><i class="far fa-lg fa-heart"></i></button>      
+     {% endif %}
+   </form>
+ {% endif %}
