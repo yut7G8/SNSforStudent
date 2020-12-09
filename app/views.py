@@ -490,6 +490,25 @@ def detail_society(request, pk, id):
         return redirect('app:logout')
 
 
+# Studentユーザに対する各Companyアカウントの詳細表示
+@login_required
+@student_required
+def detail_company(request, pk, id):
+    if request.user.pk == pk:
+        company = User.objects.get(id=id)
+        #サークルの投稿取得
+        posts = BoardModel.objects.filter(user=company)
+        #イベントの投稿取得
+        #events = Event.objects.filter(society=society)
+        connections = Connection.objects.filter(following=company)
+        for connection in connections:
+            if(connection.follower==request.user):
+                company.connected=True
+        return render(request, 'detail_company.html', {'company':company, 'posts':posts})
+    else:
+        return redirect('app:logout')
+
+
 # Studentのプロフィールに必要
 class OnlyYouMixin(UserPassesTestMixin):
     raise_exception = True
@@ -688,7 +707,7 @@ def follow_company(request, *args, **kwargs):
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
         #return render(request, 'society_list.html', {'society_list':society_list})
-        return redirect('app:view_societies' , pk=request.user.pk)
+        return redirect('app:view_companies' , pk=request.user.pk)
 
     if follower == following:
         messages.warning(request, '自分自身はフォローできませんよ')
@@ -708,6 +727,41 @@ def follow_company(request, *args, **kwargs):
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
     return redirect('app:view_companies' , pk=request.user.pk)
+
+
+@login_required
+@student_required
+def follow_company_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    try:
+        # Student
+        follower = User.objects.get(email=request.user.email)
+        # Company
+        following = User.objects.get(email=kwargs['email'])
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+        #return HttpResponseRedirect(reverse_lazy('users:index'))
+        #return render(request, 'society_list.html', {'society_list':society_list})
+        return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
+
+    if follower == following:
+        messages.warning(request, '自分自身はフォローできませんよ')
+    else:
+        _, created = Connection.objects.get_or_create(follower=follower, following=following)
+
+        if (created):
+            # Studentのフォローしている数を増やす
+            follower.following_number += 1
+            follower.save()
+            # Societyのフォローされている数を増やす
+            following.followers_number += 1
+            following.save()
+            messages.success(request, '{}をフォローしました'.format(following.username))
+        else:
+            messages.warning(request, 'あなたはすでに{}をフォローしています'.format(following.username))
+
+    #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
+    return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
 
 
 # アンフォロー
@@ -741,19 +795,146 @@ def unfollow_view(request, *args, **kwargs):
         messages.warning(request, '{}は存在しません'.format(kwargs['email']))
         #return HttpResponseRedirect(reverse_lazy('users:index'))
         #return render(request, 'society_list.html', {'society_list':society_list})
-        return redirect('app:student_profile', pk=request.user.pk)
+        return redirect('app:view_societies' , pk=request.user.pk)
         
     except Connection.DoesNotExist:
         messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
 
     #return HttpResponseRedirect(reverse_lazy('users:profile', kwargs={'email': following.username}))
     #return render(request, 'society_list.html', {'society_list':society_list})
-    return redirect('app:student_profile', pk=request.user.pk)
+    return redirect('app:view_societies' , pk=request.user.pk)
 
+# アンフォロー
+@login_required
+@student_required
+def unfollow_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:detail_society' , pk=request.user.pk, id=following.id)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_from_profile(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:student_profile' , pk=request.user.pk)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:student_profile' , pk=request.user.pk)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_company(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:view_companies' , pk=request.user.pk)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:view_companies' , pk=request.user.pk)
+
+# アンフォロー
+@login_required
+@student_required
+def unfollow_company_from_detail(request, *args, **kwargs):
+    user_list = User.objects.all()
+    society_list = []
+    for user in user_list:
+        if user.is_society:
+            society_list.append(user)
+    try:
+        follower = User.objects.get(email=request.user.email)
+        following = User.objects.get(email=kwargs['email'])
+
+        if follower != following:
+            unfollow = Connection.objects.get(follower=follower, following=following)
+            unfollow.delete()
+            # Studentのフォローしている数を減らす
+            follower.following_number -= 1
+            follower.save()
+            # Societyのフォローされている数を減らす
+            following.followers_number -= 1
+            following.save()
+    except User.DoesNotExist:
+        messages.warning(request, '{}は存在しません'.format(kwargs['email']))
+
+        return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
+        
+    except Connection.DoesNotExist:
+        messages.warning(request, 'あなたは{0}をフォローしませんでした'.format(following.username))
+
+    return redirect('app:detail_company' , pk=request.user.pk, id=following.id)
 
 
 @login_required
-@society_required
+#@society_required
 # Societyユーザによるイベント作成
 def create_event(request, pk):
     # ユーザ認証(url書き換えによるログイン偽装防止)
@@ -824,7 +1005,7 @@ def view_events(request, pk):
             return render(request, 'event_list.html', {'event_list':event_list})
 
         # Societyユーザに対する表示
-        elif request.user.is_society:
+        elif request.user.is_society or request.user.is_company:
             # ログインしてるSocietyユーザの情報取得
             society = User.objects.get(pk=pk)
             # 自身が作成したイベントを取得
@@ -869,7 +1050,7 @@ def everyevent(request, pk, id):
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
         # Societyユーザに対する表示
-        elif user.is_society:
+        elif user.is_society or user.is_company:
 
             # 追加入力がある場合
             if information.info_title != '':
@@ -881,22 +1062,45 @@ def everyevent(request, pk, id):
                 extrainfos = ExtraInfo.objects.filter(source=information)
                 # イベント参加者情報を取得
                 students = event.students.all()
+                # 参加者のうち男性の人数を記録
+                students.male = 0
+                # 参加者のうち女性の人数を記録
+                students.female = 0
                 for student in students:
                     for extrainfo in extrainfos:
                         if student == extrainfo.info_owner:
                             if student.gender==1:
                                 student.gen = '女性'
+                                students.female += 1
                             else:
                                 student.gen = '男性'
+                                students.male += 1
                             # 新しいフィールドinfoを作成し、追加情報と学生を紐付ける
                             student.info = extrainfo.info
+                return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
+
+            # 追加入力なしの場合
+            else:
+                # イベント参加者情報を取得
+                students = event.students.all()
+                # 参加者のうち男性の人数を記録
+                students.male = 0
+                # 参加者のうち女性の人数を記録
+                students.female = 0
+                for student in students:
+                    if student.gender==1:
+                        student.gen = '女性'
+                        students.female += 1
+                    else:
+                        student.gen = '男性'
+                        students.male += 1
+                    print(student.gen)
                 return render(request, 'everyevent.html', {'event': event, 'user':user, 'students':students})
             
             return render(request, 'everyevent.html', {'event': event, 'user':user})
 
     return redirect('app:logout') 
         
-
 
 # 流れ
 # 追加情報あり: join_event_comfirm → join_event_comfirm.html → join_event_comfirm(追加情報の保存) → join_event(参加者登録)
@@ -1003,7 +1207,7 @@ def cancel_event(request, pk, id):
 
 # クラスじゃなくて関数の使用で逃げる
 @login_required
-@society_required
+#@society_required
 # 編集フォーム用のedit関数。編集ボタンをeverypost.htmlに作成。
 def edit_event(request, pk, id):
     event = get_object_or_404(Event, id=id)
@@ -1060,7 +1264,7 @@ def edit_event(request, pk, id):
 
 # Societyユーザによるイベントの削除
 @login_required
-@society_required
+#@society_required
 def delete_event(request, pk, id):
     if request.user.pk == pk:
         event = get_object_or_404(Event, id=id)
@@ -1166,6 +1370,3 @@ def searchfunc(request,pk,*args, **kwargs):
                 Q(title__icontains=query)
             ).distinct()
         return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':object_list_author,'object_list_author_company':object_list_author,'query': query})
-
-
-
