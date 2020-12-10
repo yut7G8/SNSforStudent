@@ -19,10 +19,7 @@
               <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
               <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
               <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
-<<<<<<< HEAD
               <li><a href="{%url 'app:view_companies' user.pk %}" class="text-white">企業一覧</a></li>
-=======
->>>>>>> kikkawa5
               <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
           </ul>
         </div>
@@ -213,11 +210,11 @@
                       <p class="card-text">申し込み締め切り: {{ event.deadline |date:"y/n/j, H:i"}} まで </p>
 
                         <p class="card-text">
-                          <a href="{%url  'app:detail_society' user.pk event.society.id %}">
+                          <a href="{%url  'app:detail_company' user.pk event.society.id %}">
                             {% if event.society.image %}
                             <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
                             {% endif %}
-                            {{event.society.society_name}}
+                            {{event.society.company_name}}
                           </a>
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -265,11 +262,19 @@
                         <p class="card-text">申し込み締め切り: {{ event.deadline |date:"y/n/j, H:i"}} まで </p>
   
                           <p class="card-text">
+                            {% if event.society.is_society %}
                             <a href="{%url  'app:detail_society' user.pk event.society.id %}">
                               {% if event.society.image %}
                               <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
                               {% endif %}
-                              {{event.society.society_name}}
+                                {{event.society.society_name}}
+                            {% elif event.society.is_company %}
+                            <a href="{%url  'app:detail_company' user.pk event.society.id %}">
+                              {% if event.society.image %}
+                              <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
+                              {% endif %}
+                                {{event.society.company_name}}
+                            {% endif %}
                             </a>
                           </p>
                           <div class="d-flex justify-content-between align-items-center">

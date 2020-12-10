@@ -499,12 +499,12 @@ def detail_company(request, pk, id):
         #サークルの投稿取得
         posts = BoardModel.objects.filter(user=company)
         #イベントの投稿取得
-        #events = Event.objects.filter(society=society)
+        events = Event.objects.filter(society=company)
         connections = Connection.objects.filter(following=company)
         for connection in connections:
             if(connection.follower==request.user):
                 company.connected=True
-        return render(request, 'detail_company.html', {'company':company, 'posts':posts})
+        return render(request, 'detail_company.html', {'company':company, 'posts':posts, 'events':events})
     else:
         return redirect('app:logout')
 
