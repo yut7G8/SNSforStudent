@@ -77,7 +77,7 @@
       <h1 class="mt-5 pt-4 text-center">イベント一覧</h1>
         <div class="row row-cols-1 row-cols-md-3">
           {% for event in events %}
-          <div class="col mb-4" style="border:1px solid rgb(163, 159, 159)">
+          <div class="col mb-4">
             <div class="card m-4" style="max-height: 400;">
               {% if event.images %}
                 <img style="max-height: 300;" class="card-img-top" src="{{ event.images.url }}"> 
