@@ -1265,7 +1265,7 @@ def edit_event(request, pk, id):
 # Societyユーザによるイベントの削除
 @login_required
 #@society_required
-def delete_event(request, pk, id):
+def delete_event(request, pk, id):                                                  
     if request.user.pk == pk:
         event = get_object_or_404(Event, id=id)
         shusaisha = event.society
@@ -1341,20 +1341,6 @@ def searchfunc(request,pk,*args, **kwargs):
         object_list_title = object_list.filter(
                 Q(content__icontains=tag)
             ).distinct()
-
-        #print(object_list_title[0].user.email)
-        
-        # if (object_list_author is not None) and (object_list_title is not None):
-        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
-
-        # elif (object_list_author is  None) and (object_list_title is not None):
-        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
-
-        # elif (object_list_author is not None) and (object_list_title is None):
-        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
-        
-        # else:
-        #     return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'query': query,'number_society':number_society})
 
         return render(request,'search.html',{'object_list_title':object_list_title,'object_list_author':society_list,'object_list_author_company':object_list_author_company,'query': query,'number_society':number_society,'number_company':number_company})
 

@@ -64,6 +64,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     followers_number = models.IntegerField(_('followers_number'),null=True,blank=True,default=0)
     following_number = models.IntegerField(_('following_number'),null=True,blank=True,default=0)
 
+    #url情報を入れることができるように改良
+    url_info = models.URLField(default=None,null=True)
+
 
     is_student = models.BooleanField(default=False)
     is_society = models.BooleanField(default=False)

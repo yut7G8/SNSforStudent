@@ -126,9 +126,18 @@
    <div class="p-3">
    <p class="card-text">{{ event.content }}</p>
    <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}}</p>
+   {% if event.url %}
+   <p>URL情報:<a href="{{event.url}}">{{event.url}}</a></p> 
+   {% endif %}
 
   {% if user.is_student %}
+
+   {% if event.society.is_society %}
       <p>サークル: </sa-kuru><a href="{%url 'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+    {% elif event.society.is_company %}
+      <p>企業:<a href="{%url 'app:detail_company' user.pk event.society.id %}">{{event.society.company_name}}</a></p>
+    {% endif %}
+
       {% if event.joined %}
         <p>あなたはすでにこのイベントに申し込み済です。</p>
         <div style="text-align: center;">

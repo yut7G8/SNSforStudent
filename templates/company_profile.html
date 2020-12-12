@@ -19,6 +19,14 @@
           <th>ひとこと</th>
           <td>{{ user.about_me }}</td>
         </tr>
+        <tr>
+            <th>URL情報</th>
+            <td>
+            {% if user.url_info %}
+            <a href="{{user.url_info}}">{{ user.url_info }}</a>
+            {%endif%}
+            </td>
+          </tr>
     </tbody>
 </table>
 <br>

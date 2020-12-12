@@ -89,6 +89,12 @@
     
      <label for="id_content" class="sr-only">本文</label>
      {{ form.content|add_class:"form-control mb-3"}}
+
+     <p>URL情報</p>
+     <div style="text-align: center;">
+     <label for="id_info" class="sr-only">URL</label>
+     {{ form.url }}
+     </div>
     
      <p>申し込み締め切り</p>
      <div style="text-align: center;">
@@ -111,5 +117,4 @@
     </div>
     </form>
 </div>
-
 {% endblock %}

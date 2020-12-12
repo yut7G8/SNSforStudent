@@ -14,6 +14,12 @@
     {% endif %}
     <p>企業名：{{company.company_name}}</p>
     <p>代表者連絡先：{{company.email}}</p>
+    <p>
+      URL情報：
+      {%if company.url_info %}
+    <a href="{{company.url_info}}">{{ company.url_info }}</a>
+      {% endif %}
+    </p>
 
     <div class="btn-group">
       {% if company.connected %}

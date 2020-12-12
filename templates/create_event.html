@@ -89,9 +89,10 @@
      <label for="id_content" class="sr-only">本文</label>
      <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
 
-     <div class="mb-3 form-control text-secondary">
-      <label>URL</label>
-        {{ form.url }}
+     <p>URL情報</p>
+     <div style="text-align: center;">
+     <label for="id_info" class="sr-only">URL</label>
+     {{ form.url }}
      </div>
     
      <p>申し込み締め切り</p>

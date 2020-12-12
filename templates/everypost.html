@@ -120,9 +120,16 @@
    <h3 class="card-title font-weight-bold text-center">{{ post.title }}</h3>
    <div class="p-3">
    <p class="card-text">{{ post.content }}</p>
-   <a href="{{post.url}}">URL情報 : {{post.url}}</a> 
+   {% if post.url %}
+   <p>URL情報:<a href="{{post.url}}">{{post.url}}</a></p> 
+   {% endif %}
+
    {% if user.is_student %}
-   <a href="{%url 'app:detail_society' user.pk post.user.id %}"><p>投稿者　{{post.author}}</p></a>
+   {%if post.is_society %}
+   <p>投稿者:<a href="{%url 'app:detail_society' user.pk post.user.id %}">{{post.author}}</a></p>
+   {% else %}
+   <p>投稿者:<a href="{%url 'app:detail_company' user.pk post.user.id %}">{{post.author}}</a></p>
+   {% endif %}
    <div id="like">
     {% include 'like.html' %}
    </div>
