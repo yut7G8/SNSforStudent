@@ -7,43 +7,45 @@
 
 {% block content %}
 <h1 class="mt-5 pt-4 text-center">新規投稿</h1>
-<form action="{% url 'app:add_company' user.pk %}" method="POST" enctype="multipart/form-data">
- {% csrf_token %}
+<div class="w-50 mx-md-auto">
+    <form action="{% url 'app:add_company' user.pk %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
 
- <label for="id_title" class="sr-only">タイトル</label>
- <input type="text" name="title" placeholder="タイトル" maxlength="50" class="form-control mb-3" required id="id_title">
+    <label for="id_title" class="sr-only">タイトル</label>
+    <input type="text" name="title" placeholder="タイトル" maxlength="50" class="form-control mb-3" required id="id_title">
 
- <label for="id_content" class="sr-only">本文</label>
- <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
- 
- <div class="mb-3 form-control text-secondary">
+    <label for="id_content" class="sr-only">本文</label>
+    <textarea type="text" name="content" placeholder="本文" cols="40" rows="10" class="form-control mb-3" required id="id_content"></textarea>
+
+    <div class="mb-3 form-control text-secondary">
     <label>画像</label>
-        {{ form.images }}
- </div>
+    {{ form.images }}
+    </div>
 
- <div class="mb-3 form-control text-secondary">
+    <div class="mb-3 form-control text-secondary">
     <label>URL</label>
-        {{ form.url }}
- </div>
- 
- <!--<label for="id_author" class="sr-only">author</label>
- <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
- 
- <div class="mb-3 form-control text-secondary">
-  <label>いいね(・∀・)ｲｲﾈ!!</label>
-      {{ form.good }}
- </div>
+    {{ form.url }}
+    </div>
 
- <div class="mb-3 form-control text-secondary">
-  <label>閲覧数</label>
-      {{ form.read }}
- </div>
- 
- <div class="mb-3 form-control text-secondary">
-  <label>readtext</label>
-      {{ form.readtext }}-->
- </div>
- 
- <button type="submit" class="btn btn-block btn-outline-success">投稿する</button>
-</form>
+    <!--<label for="id_author" class="sr-only">author</label>
+    <input type="text" name="author" placeholder="投稿者" maxlength="50" class="form-control mb-3" required id="id_author">
+
+    <div class="mb-3 form-control text-secondary">
+    <label>いいね(・∀・)ｲｲﾈ!!</label>
+    {{ form.good }}
+    </div>
+
+    <div class="mb-3 form-control text-secondary">
+    <label>閲覧数</label>
+    {{ form.read }}
+    </div>
+
+    <div class="mb-3 form-control text-secondary">
+    <label>readtext</label>
+    {{ form.readtext }}-->
+    </div>
+
+    <button type="submit" class="btn btn-block btn-outline-success">投稿する</button>
+    </form>
+</div>
 {% endblock %}
