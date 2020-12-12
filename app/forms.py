@@ -138,6 +138,9 @@ class SocietyProfileUpdateForm(forms.ModelForm):
             field.widget.attrs['class'] = 'form-control'
 
 class CompanyProfileUpdateForm(forms.ModelForm):
+
+    url = forms.URLField(required=False)
+
     """societyのプロフィール更新用のフォーム定義"""
     class Meta:
         model = User
