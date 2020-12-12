@@ -166,6 +166,7 @@ class CreateEventForm(forms.ModelForm):
 
     #event_date = forms.SplitDateTimeField(label='作成日')
     #extra_info = forms.CharField(required=False)
+    url = forms.URLField(required=False)
 
     class Meta:
         model = Event

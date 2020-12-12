@@ -210,11 +210,11 @@
                       <p class="card-text">申し込み締め切り: {{ event.deadline |date:"y/n/j, H:i"}} まで </p>
 
                         <p class="card-text">
-                          <a href="{%url  'app:detail_society' user.pk event.society.id %}">
+                          <a href="{%url  'app:detail_company' user.pk event.society.id %}">
                             {% if event.society.image %}
                             <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
                             {% endif %}
-                            {{event.society.society_name}}
+                            {{event.society.company_name}}
                           </a>
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -262,11 +262,19 @@
                         <p class="card-text">申し込み締め切り: {{ event.deadline |date:"y/n/j, H:i"}} まで </p>
   
                           <p class="card-text">
+                            {% if event.society.is_society %}
                             <a href="{%url  'app:detail_society' user.pk event.society.id %}">
                               {% if event.society.image %}
                               <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
                               {% endif %}
-                              {{event.society.society_name}}
+                                {{event.society.society_name}}
+                            {% elif event.society.is_company %}
+                            <a href="{%url  'app:detail_company' user.pk event.society.id %}">
+                              {% if event.society.image %}
+                              <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ event.society.image.url }}" alt="no img">
+                              {% endif %}
+                                {{event.society.company_name}}
+                            {% endif %}
                             </a>
                           </p>
                           <div class="d-flex justify-content-between align-items-center">
