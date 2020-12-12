@@ -10,7 +10,7 @@
  
   <div class="alert alert-success" role="alert">
     {% if company.image %}
-    <img style="width:100px; height: 100px; object-fit:cover; border-radius:50%; ;" src="{{ society.image.url }}" alt="no img"> 
+    <img style="width:100px; height: 100px; object-fit:cover; border-radius:50%; ;" src="{{ company.image.url }}" alt="no img"> 
     {% endif %}
     <p>企業名：{{company.company_name}}</p>
     <p>代表者連絡先：{{company.email}}</p>
@@ -53,8 +53,8 @@
               <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
             {% endif %}
             <p class="card-text">
-              {% if society.image %}
-              <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ society.image.url }}" alt="no img">
+              {% if company.image %}
+              <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ company.image.url }}" alt="no img">
               {% endif %}
               {{post.author}}
             </p>
@@ -73,9 +73,40 @@
       </div>
     </div>
     <div id="events" class="tab-pane">
-
+      <h1 class="mt-5 pt-4 text-center">イベント一覧</h1>
+        <div class="row row-cols-1 row-cols-md-3">
+          {% for event in events %}
+          <div class="col mb-4" style="border:1px solid rgb(163, 159, 159)">
+            <div class="card m-4" style="max-height: 400;">
+              {% if event.images %}
+                <img style="max-height: 300;" class="card-img-top" src="{{ event.images.url }}"> 
+                <hr class="mt-0">
+              {% else %}
+              <!--
+                <div class="p-1 border border-secondary text-center pt-5" style="min-width: 300; min-height: 225;">No images</div>
+              -->
+              {% endif %}
+              <p class="card-text">
+                {% if company.image %}
+                <img style="width:50px; height: 50px; object-fit:cover; border-radius:50%;" align="middle" src="{{ company.image.url }}" alt="no img">
+                {% endif %}
+                {{event.society.company_name}}
+              </p>
+              <a href="{%url 'app:everyevent' user.pk event.id %}">
+              <h4 class="card-title" style="text-align:center;">{{event.event_name|truncatechars:10 | linebreaksbr}}</h4>
+              </a>
+  
+              <p class="card-text">
+              　{{ event.content|truncatechars:17 }}
+              </p>
+              <!-- <p>{{post.good}}</p>
+              <p>{{post.read}}</p> -->
+              <p class="card-text">{{event.event_date}}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
     </div>
-
   </div>
 
 </div>

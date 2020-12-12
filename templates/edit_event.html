@@ -75,40 +75,41 @@
 
 {% block content %}
 <h1 class="mt-5 pt-4 text-center">イベント編集</h1>
-<form method="POST" enctype="multipart/form-data">
- {% csrf_token %}
-
- <label for="id_title" class="sr-only">イベント名</label>
- {{ form.event_name|add_class:"form-control mb-3"}}
-
- <div class="mb-3 form-control text-secondary">
-    <label>画像</label>
+<div class="w-50 mx-md-auto">
+    <form method="POST" enctype="multipart/form-data">
+     {% csrf_token %}
+    
+     <label for="id_title" class="sr-only">イベント名</label>
+     {{ form.event_name|add_class:"form-control mb-3"}}
+    
+     <div class="mb-5 form-control text-secondary">
+        <label>画像</label>
         {{ form.images }}
+     </div>
+    
+     <label for="id_content" class="sr-only">本文</label>
+     {{ form.content|add_class:"form-control mb-3"}}
+    
+     <p>申し込み締め切り</p>
+     <div style="text-align: center;">
+     <label for="id_deadline" class="sr-only">申し込み締め切り</label>
+     <input type="datetime-local" name="deadline" placeholder="開催日時" required id="id_deadline">
+     <br>(変更前: {{ event.deadline }})
+     </div>
+     <br>
+     
+     <p>開催日時</p>
+     <div style="text-align: center;">
+     <label for="id_event_date" class="sr-only">開催日時</label>
+     <input type="datetime-local" name="event_date" placeholder="開催日時" required id="id_event_date">
+     <br>(変更前: {{ event.event_date }})
+     </div>
+     <br>
+    
+     <div style="text-align: center;">
+     <button type="submit" class="btn btn-block btn-outline-success">編集する</button>
+    </div>
+    </form>
 </div>
-<br>
-<br>
 
- <label for="id_content" class="sr-only">本文</label>
- {{ form.content|add_class:"form-control mb-3"}}
-
- <p>申し込み締め切り</p>
- <div style="text-align: center;">
- <label for="id_deadline" class="sr-only">申し込み締め切り</label>
- <input type="datetime-local" name="deadline" placeholder="開催日時" required id="id_deadline">
- <br>(変更前: {{ event.deadline }})
- </div>
- <br>
- 
- <p>開催日時</p>
- <div style="text-align: center;">
- <label for="id_event_date" class="sr-only">開催日時</label>
- <input type="datetime-local" name="event_date" placeholder="開催日時" required id="id_event_date">
- <br>(変更前: {{ event.event_date }})
- </div>
- <br>
-
- <div style="text-align: center;">
- <button type="submit" class="btn btn-block btn-outline-success">編集する</button>
-</div>
-</form>
 {% endblock %}

@@ -143,13 +143,16 @@ class BoardModel(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     author = models.CharField(max_length=100)
-    images = models.ImageField(upload_to='')
+    images = models.ImageField(upload_to='', blank=True)
     good = models.IntegerField(default=0)
     read = models.IntegerField(default=0)
     readtext = models.CharField(max_length=200)
     # いいね機能. ManytoMabyFieldを使用.
     like = models.ManyToManyField(User, related_name='like', blank=True)
     created_at = models.DateTimeField('投稿日', default=timezone.now)
+
+    #橘川追加
+    url = models.URLField(default=None)
 
 
     def __str__(self):
@@ -185,6 +188,9 @@ class Event(models.Model):
     event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
     # 申し込み締め切り日時
     deadline = models.DateTimeField(verbose_name="締め切り日時", default=datetime.now)
+
+    #橘川追加
+    url = models.URLField(default=None)
 
     def __str__(self):
         return self.event_name
