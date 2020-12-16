@@ -125,7 +125,7 @@
    {% endif %}
 
    {% if user.is_student %}
-   {%if post.is_society %}
+   {%if post.user.is_society %}
    <p>投稿者:<a href="{%url 'app:detail_society' user.pk post.user.id %}">{{post.author}}</a></p>
    {% else %}
    <p>投稿者:<a href="{%url 'app:detail_company' user.pk post.user.id %}">{{post.author}}</a></p>
