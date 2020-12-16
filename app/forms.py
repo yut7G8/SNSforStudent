@@ -139,7 +139,7 @@ class SocietyProfileUpdateForm(forms.ModelForm):
 
 class CompanyProfileUpdateForm(forms.ModelForm):
 
-    url = forms.URLField(required=False)
+    url_info = forms.URLField(required=False)
 
     """societyのプロフィール更新用のフォーム定義"""
     class Meta:
