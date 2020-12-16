@@ -58,9 +58,9 @@
 
     <div class="album py-5 bg-light">
         <div class="container">
-        {% for society in following %}
-        {% if society.is_society %}
-        <div class="row">
+          <div class="row row-cols-md-3">
+          {% for society in following %}
+          {% if society.is_society %}
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
                     <br>
@@ -78,9 +78,9 @@
                       </div>
                 </div>
             </div>
-        </div>
-        {% endif %}
-        {% endfor %} 
+          {% endif %}
+          {% endfor %} 
+          </div>
         </div>
     </div>
     </div>
@@ -90,9 +90,9 @@
   
       <div class="album py-5 bg-light">
           <div class="container">
-          {% for company in following %}
-          {% if company.is_company %}
-          <div class="row">
+            <div class="row row-cols-md-3">
+            {% for company in following %}
+            {% if company.is_company %}
               <div class="col-md-4">
                   <div class="card mb-4 shadow-sm">
                       <br>
@@ -109,9 +109,9 @@
                         </div>
                   </div>
               </div>
-          </div>
-          {% endif %}
-          {% endfor %}      
+            {% endif %}
+            {% endfor %}  
+            </div>    
           </div>
       </div>
     </div>
