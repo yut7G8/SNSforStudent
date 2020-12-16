@@ -1,0 +1,28 @@
+<!--使わない-->
+{% extends 'base3.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'style.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+
+<!--<div class="row">-->
+    <!-- 左側、ログインエリア -->
+    <!--<div class="card col-md-6">--> 
+       <!--<div class="card-body" style="margin-top: 55px">-->
+            <form action="{% url 'app:login' %}" method="POST">
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    {{ field }}
+                    {{ field.errors }}
+                    <hr>
+                {% endfor %}
+                <button type="submit" class="btn btn-success btn-lg btn-block" >Login</button>
+                <input type="hidden" name="next" value="{{ next }}" />
+                {% csrf_token %}
+            </form>
+        <!--</div>-->
+
+{% endblock content %}

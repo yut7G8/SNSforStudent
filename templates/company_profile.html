@@ -1,0 +1,35 @@
+{% extends 'base_company.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block content %}
+{% if user.image %}
+<img style="width:200px; height: 200px; object-fit:cover; border-radius:50%; ;" class="card-img-top" src="{{ user.image.url }}"> 
+{% endif %}
+<table class="table">
+    <tbody>
+        <tr>
+            <th>企業名</th>
+            <td>{{ user.company_name }}</td>
+        </tr>
+        <tr>
+          <th>ひとこと</th>
+          <td>{{ user.about_me }}</td>
+        </tr>
+        <tr>
+            <th>URL情報</th>
+            <td>
+            {% if user.url_info %}
+            <a href="{{user.url_info}}">{{ user.url_info }}</a>
+            {%endif%}
+            </td>
+          </tr>
+    </tbody>
+</table>
+<br>
+<a class="btn btn-primary" href="{% url 'app:company_profile_update' user.pk %}">プロフィール更新ページ</a>
+{% endblock %}
+</html>

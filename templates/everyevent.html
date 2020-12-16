@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block customcss %}
+<link rel='stylesheet' type='text/css' href="{% static 'album.css' %}">
+{% endblock customcss %}
+
+{% block header %}
+{% if user.is_student %}
+<header>
+  <div class="collapse bg-dark" id="navbarHeader">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 col-md-7 py-4">
+          <h4 class="text-white">Menu</h4>
+          <ul class="list-unstyled">
+              <li><a href="{%url 'app:student_home' user.pk %}" class="text-white">top</a></li>              
+              <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
+              <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+              <li><a href="{%url 'app:view_societies' user.pk %}" class="text-white">サークル一覧</a></li>
+              <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント一覧</a></li>
+              <li><a href="{%url 'app:view_companies' user.pk %}" class="text-white">企業一覧</a></li>
+              <li><a href="{% url 'app:student_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container d-flex justify-content-between">
+      <a href="{%url 'app:student_home' user.pk %}" class="navbar-brand d-flex align-items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <strong>学生向けSNS</strong>
+      </a>
+      <!-- 検索フォーム -->
+      <div class="d-flex justify-content-center">
+        <form class="form-inline my-2" method="GET" action="{% url 'app:search' user.pk %}">
+        <input type="text" class="form-control" name="q" value="{{request.GET.q}}">
+        <button type="submit" value="search" class="btn btn-outline-secondary">検索</button>
+        </form>
+        </div>
+      <!-- 検索フォーム -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+{% elif user.is_society %}
+<header>
+    <div class="collapse bg-dark" id="navbarHeader">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-8 col-md-7 py-4">
+            <h4 class="text-white">Menu</h4>
+            <ul class="list-unstyled">
+                <li><a href="{%url 'app:society_home' user.pk %}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</a></li>  
+                <li><a href="{% url 'app:add' user.pk %}" class="text-white">投稿する</a></li>
+                <li><a href="{% url 'app:society_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container d-flex justify-content-between">
+        <a href="{%url 'app:society_home' user.pk %}" class="navbar-brand d-flex align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <strong>学生向けSNS</strong>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+{% elif user.is_company %}
+  <header>
+      <div class="collapse bg-dark" id="navbarHeader">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8 col-md-7 py-4">
+              <h4 class="text-white">Menu</h4>
+              <ul class="list-unstyled">
+                <li><a href="{%url 'app:company_home' user.pk %}" class="text-white">top</a></li>
+                <li><a href="{%url 'app:logout'%}" class="text-white">Logout</a></li>
+                <li><a href="{%url 'app:login'%}" class="text-white">Change Account</a></li>
+                <li><a href="{%url 'app:view_events' user.pk %}" class="text-white">イベント</a></li>
+                <li><a href="{% url 'app:add_company' user.pk %}" class="text-white">投稿する</a></li>
+                <li><a href="{% url 'app:company_profile' user.pk %}" class="text-white">ユーザー情報</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+          <a href="{%url 'app:company_home' user.pk %}" class="navbar-brand d-flex align-items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2" viewBox="0 0 24 24" focusable="false"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <strong>学生向けSNS</strong>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+    </header>
+{% endif %}
+{% endblock header %}
+
+{% block content %}   
+
+<div class="card text-secondary" style="margin-top: 55px;">
+  {% if event.images %}
+  <img style="width: 400px; max-height: 500;" class="img-fluid mx-auto" src="{{ event.images.url }}">
+  {% else %}
+  <div class="p-1 border border-secondary text-center pt-5" style="min-width: 500; min-height: 400;">No images</div>
+  {% endif %}
+<div class="card-body">
+   <h3 class="card-title font-weight-bold text-center">{{ event.event_name }}</h3>
+   <div class="p-3">
+   <p class="card-text">{{ event.content }}</p>
+   <p class="card-text">開催日時: {{ event.event_date |date:"y/n/j, H:i"}}</p>
+   {% if event.url %}
+   <p>URL情報:<a href="{{event.url}}">{{event.url}}</a></p> 
+   {% endif %}
+
+  {% if user.is_student %}
+
+   {% if event.society.is_society %}
+      <p>サークル: </sa-kuru><a href="{%url 'app:detail_society' user.pk event.society.id %}">{{event.society.society_name}}</a></p>
+    {% elif event.society.is_company %}
+      <p>企業:<a href="{%url 'app:detail_company' user.pk event.society.id %}">{{event.society.company_name}}</a></p>
+    {% endif %}
+
+      {% if event.joined %}
+        <p>あなたはすでにこのイベントに申し込み済です。</p>
+        <div style="text-align: center;">
+          <div class="btn-group">
+            <a href="{%url 'app:cancel_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加キャンセル</a>
+          </div>
+        </div>
+      {% elif event.expired %}
+        <p>このイベントの申し込み期限は過ぎています。</p>
+      {% else%}
+      <div style="text-align: center;">
+        <div class="btn-group">
+          <a href="{%url 'app:join_event_confirm' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">参加フォームへ</a>
+        </div>
+      </div>
+      {% endif%}
+
+  {% else %}
+  <br>
+
+   <h5 style="text-align:center">参加者名簿</h5>
+   <br>
+   <div style="text-align: center;">
+
+    <style type="text/css">
+    table {
+      border-collapse: collapse;
+      color: #333; /* 全体の文字色 */
+      background-color: #f0f2f7; /* 全体の背景色 */
+    }
+    th, td {
+      padding: 5px 10px;
+      border: solid 1px #adb3c1;
+    }</style>
+
+    {% if event.flag %}
+    <table width="100%">
+      <tr>
+        <th>姓</th>
+        <th>名</th>
+        <th>性別</th>
+        <th>大学</th>
+        <th>学年</th>
+        <th>メールアドレス</th>
+        <th>{{event.extra}}</th>
+      </tr>
+      {% for student in students %}
+      <tr>
+        <td>{{student.first_name}}</td>
+        <td>{{student.last_name}}</td>
+        <td>{{student.gen}}</td>
+        <td>{{student.school_name}}</td>
+        <td>{{student.grade}}</td>
+        <td>{{student.email}}</td>
+        <td>{{student.info}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    {% else %}
+    <table width="100%">
+      <tr>
+        <th>姓</th>
+        <th>名</th>
+        <th>性別</th>
+        <th>大学</th>
+        <th>学年</th>
+        <th>メールアドレス</th>
+      </tr>
+      {% for student in students%}
+      <tr>
+        <td>{{student.first_name}}</td>
+        <td>{{student.last_name}}</td>
+        <td>{{student.gen}}</td>
+        <td>{{student.school_name}}</td>
+        <td>{{student.grade}}</td>
+        <td>{{student.email}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+
+    <br>
+    <table width="70%" align="center">
+      <tr>
+        <th>女性</th>
+        <th>{{students.female}}</th>
+        <th>男性</th>
+        <th>{{students.male}}</th>
+        <th>合計</th>
+        <th>{{students.count}}</th>
+      </tr>
+    </table>
+
+   </div>
+  </div>
+
+ <br>
+  <div style="text-align: center;">
+   <div class="btn-group">
+     <a href="{%url 'app:edit_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント編集</a>
+   </div>
+ </div>
+
+  <br>
+  <div style="text-align: center;">
+   <div class="btn-group">
+     <a href="{%url 'app:delete_event' user.pk event.id %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">イベント削除</a>
+   </div>
+ </div>
+ {% endif %}
+
+</div>
+</div>
+{% endblock %}
