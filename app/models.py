@@ -186,7 +186,7 @@ class Event(models.Model):
     # イベント内容
     content = models.TextField()
     # 宣伝用画像
-    images = models.ImageField(upload_to='',blank=True,null=True)
+    images = models.ImageField(upload_to='', blank=True, null=True)
     # イベント開催日
     event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
     # 申し込み締め切り日時
