@@ -146,7 +146,7 @@ class BoardModel(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     author = models.CharField(max_length=100)
-    images = models.ImageField(upload_to='')
+    images = models.ImageField(upload_to='', blank=True)
     good = models.IntegerField(default=0)
     read = models.IntegerField(default=0)
     readtext = models.CharField(max_length=200)
@@ -186,7 +186,7 @@ class Event(models.Model):
     # イベント内容
     content = models.TextField()
     # 宣伝用画像
-    images = models.ImageField(upload_to='')
+    images = models.ImageField(upload_to='', blank=True, null=True)
     # イベント開催日
     event_date = models.DateTimeField(verbose_name="開催日時", default=datetime.now)
     # 申し込み締め切り日時
