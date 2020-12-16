@@ -9,8 +9,8 @@
 <main role="main">
 <div class="album py-5 bg-light">
     <div class="container">
-    {% for company in company_list %} 
-    <div class="row">
+      <div class="row row-cols-md-3">
+      {% for company in company_list %} 
         <div class="col-md-4">
             <div class="card mb-4 shadow-sm">
                 <br>
@@ -31,8 +31,8 @@
                   </div>
             </div>
         </div>
-    </div>
-    {% endfor %}
+      {% endfor %}
+      </div>
 
     </div>
 </div>
