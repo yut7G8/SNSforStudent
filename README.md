@@ -1,5 +1,5 @@
 # 学生向けSNSアプリ
-## HAIT_Lab_Advancedコース Eチーム
 開発期間10月~12月26日
-各種機能紹介
-**ログイン機能**
+## HAIT_Lab_Advancedコース Eチーム
+**メンバー**
+yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
