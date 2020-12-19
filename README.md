@@ -1,7 +1,7 @@
 # 学生向けSNSアプリ
 開発期間10月1日~12月26日
 
-**[HAIT_Lab_Advancedコース](https://hait-lab.com/) Eチームメンバー**
+**[HAIT_Lab_Advancedコース](https://hait-lab.com/)2期 Eチームメンバー**
 
 yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
@@ -16,9 +16,9 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 4. セキュリティ(学生・サークル)
 
 ### yut7G8
-1. 投稿機能(新規作成・編集・削除)
+1. [投稿機能(新規作成・編集・削除)](https://note.com/takuya814/m/m829ed8312291)
 
-2. いいねボタン
+2. [いいねボタン](https://note.com/takuya814/n/n896441e790ba?magazine_key=m829ed8312291)
 
 3. GitHubの管理
 
