@@ -5,9 +5,9 @@
 
 yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
-## 各種担当機能
+## 各種担当機能(参考サイト)
 ### ham-sh
-1. アカウント新規作成・ログイン機能
+1. [アカウント新規作成・ログイン機能](https://blog.narito.ninja/detail/38/)
 
 2. フォロー機能
 
@@ -28,10 +28,10 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 2. URL追加機能
 
 ### amazing-tomotoshi
-1. ユーザー情報表示
+1. [ユーザー情報(表示・編集)](https://blog.narito.ninja/detail/43/)
 
-2. アイコン表示
+2. [アイコン表示](https://blog.ver001.com/css-image-border-radius-object-fit/)
 
-3. タブ機能
+3. [タブ機能](https://ics.media/entry/190826/)
 
-4. デザイン修正(HTML, CSS)
+4. [デザイン修正(HTML, CSS)](https://qiita.com/nakanishi03/items/c80a16b9b9796c25f890)
