@@ -7,7 +7,7 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
 **各種担当機能**
 
-#### ham-sh
+### ham-sh
 1. アカウント新規作成・ログイン機能
 
 2. フォロー機能
