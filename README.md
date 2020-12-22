@@ -13,7 +13,7 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
 3. イベント投稿(新規作成・編集削除)
 
-4. セキュリティ(学生・サークル)
+4. [セキュリティ(学生・サークル)](https://stackoverrun.com/ja/q/12115655)
 
 ### yut7G8
 1. [投稿機能(新規作成・編集・削除)](https://note.com/takuya814/m/m829ed8312291)
