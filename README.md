@@ -27,6 +27,8 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
 2. URL追加機能
 
+3. 企業アカウント作成
+
 ### amazing-tomotoshi
 1. [ユーザー情報(表示・編集)](https://blog.narito.ninja/detail/43/)
 
