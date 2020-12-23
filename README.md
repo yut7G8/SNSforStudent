@@ -9,7 +9,7 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 ### ham-sh
 1. [アカウント新規作成・ログイン機能](https://blog.narito.ninja/detail/38/)
 
-2. フォロー機能
+2. [フォロー機能](https://jyouj.hatenablog.com/entry/2018/06/04/000311)
 
 3. イベント投稿(新規作成・編集削除)
 
@@ -23,7 +23,7 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 3. GitHubの管理
 
 ### kkzs30842107
-1. 検索機能
+1. [検索機能](https://note.com/takuya814/n/ndde42e157fe0?magazine_key=m829ed8312291)
 
 2. URL追加機能
 
