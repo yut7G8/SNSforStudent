@@ -5,6 +5,23 @@
 
 yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
+## 開発背景
+
+1. **サークル目線**
+
+新歓やイベントの参加学生の管理を簡単にしたい
+
+2. **学生目線**
+
+新歓期にサークルの情報を閲覧したい
+
+企業の情報を知り、就活に役立てたい
+
+3. **企業目線**
+
+学生に向けたピンポイントな情報を流したい
+
+
 ## 各種担当機能(参考サイト)
 ### ham-sh
 1. [アカウント新規作成・ログイン機能](https://blog.narito.ninja/detail/38/)
@@ -37,3 +54,6 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 3. [タブ機能](https://ics.media/entry/190826/)
 
 4. [デザイン修正(HTML, CSS)](https://qiita.com/nakanishi03/items/c80a16b9b9796c25f890)
+
+#### 注意
+**無断転載禁止**
