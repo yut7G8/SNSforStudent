@@ -2,6 +2,9 @@
 開発期間**2020年10月1日~12月26日**
 
 編集日**2021年1月5日**
+
+更新日**2021年2月1日**
+
 編集者**yut7G8**
 
 **[HAIT_Lab_Advancedコース](https://hait-lab.com/)2期 Eチームメンバー**
@@ -24,6 +27,16 @@ yut7G8, amazing-tomotoshi, ham-sh, Kkzs30842107
 
 学生に向けたピンポイントな情報を流したい
 
+## 使い方
+1. **DBの作成**
+```
+python manage.py makemigrations app
+python manage.py migrate
+```
+2. **起動**(ローカルパス指定)
+```
+python manage.py runserver
+```
 
 ## 各種担当機能(参考サイト)
 ### ham-sh
